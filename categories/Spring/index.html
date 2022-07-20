@@ -60,33 +60,29 @@
 
 <div class="widgets"><div class='widget-wrap' id='markdown'>
   <div class='widget-header cap dis-select'>
-    <span class='name'>Stellar 入门指南</span>
+    <span class='name'>「想做却不该做的事要忍着不做」，<br> 「不想做却该做的事要坚持把他做好」</span>
   </div>
   <div class='widget-body fs14'>
     
-      <p>欢迎使用 <a target="_blank" rel="noopener" href="https://github.com/xaoxuu/hexo-theme-stellar/">Stellar</a> 主题，下面是您的入门指南，祝您使用愉快！</p>
+      <h3 id="恭迎光临，代码你行"><a href="#恭迎光临，代码你行" class="headerlink" title="恭迎光临，代码你行"></a>恭迎光临，代码你行</h3>
+    
+      <br>
+    
+      <p><strong>我是谁?</strong></p>
+
+    
+      <p>一个real的JavaBoy</p>
 
     
       <br>
     
-      <p><strong>第一步</strong></p>
+      <p><strong>以后想要干啥？</strong></p>
 
     
-      <p>创建 <code>blog/_config.stellar.yml</code> 文件，在此文件中填写需要自定义的主题配置。</p>
-
-    
-      <br>
-    
-      <p><strong>第二步</strong></p>
-
-    
-      <p>创建 <code>blog/source/_data/widgets.yml</code> 文件，此文件中填写需要自定义的侧边栏组件，例如 <code>welcome</code> 组件。</p>
+      <p>目前工作两年，后端和运维都想沾点，准备再干五年试试！</p>
 
     
       <br>
-    
-      <p>如果有任何疑问，请先查阅<a target="_blank" rel="noopener" href="https://xaoxuu.com/wiki/stellar/">文档</a>，如果文档中没有提供，请提 <a target="_blank" rel="noopener" href="https://github.com/xaoxuu/hexo-theme-stellar/issues/">issue</a> 向开发中询问。</p>
-
     
   </div>
 </div>
@@ -133,7 +129,10 @@
   </nav>
 </div>
 
-  <div class="post-list post"><a class="post-card post " href="/2022/03/16/SpringBoot%20%E4%B8%AD%E4%BD%BF%E7%94%A8%20Filter%20%E7%9A%84%E6%AD%A3%E7%A1%AE%E5%A7%BF%E5%8A%BF/"><article class="md">
+  <div class="post-list post"><a class="post-card post " href="/2022/06/21/%E6%B3%A8%E8%A7%A3Configuration%E5%92%8C%E6%B3%A8%E8%A7%A3Component%E7%94%A8%E6%B3%95%E5%92%8C%E5%BC%82%E5%90%8C/"><article class="md">
+<h2 class="post-title">Configuration和Component用法和异同</h2><div class="excerpt"><p>一、各自在代码中的定义先看一下Spring中的类定义
+123456789@Target(ElementType.TYPE)@Retention(RetentionPolicy.RUNTIME)@Documented@Componentpublic @interface Configuration &#123;   @AliasFor(annotation = Component.class)...</p></div><div class="meta cap"><span class="cap" id="post-meta">发布于&nbsp;<time datetime="2022-06-21T02:31:59.523Z">2022-06-21</time></span><span class="cap breadcrumb">Spring</span><div>
+</article></a><a class="post-card post " href="/2022/03/16/SpringBoot%20%E4%B8%AD%E4%BD%BF%E7%94%A8%20Filter%20%E7%9A%84%E6%AD%A3%E7%A1%AE%E5%A7%BF%E5%8A%BF/"><article class="md">
 <h2 class="post-title">SpringBoot 中使用 Filter 的正确姿势</h2><div class="excerpt"><p>SpringBoot 中使用 Filter 的正确姿势Filter 是 JavaEE 中 Servlet 规范的一个组件，位于包javax.servlet 中，它可以在 HTTP 请求到达 Servlet 之前，被一个或多个Filter处理。
 它的工作流程如图：
 Filter的这个特性在生产环境中有很广泛的应用，如：修改请求和响应、防止xss攻击、包装二进制流使其可以多次读，等等。

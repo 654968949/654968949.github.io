@@ -17,12 +17,12 @@
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
   <meta name="theme-color" content="#f8f8f8">
-  <title>分类 - Woods's Blog</title>
+  <title>标签：SpringBoot - Woods's Blog</title>
 
   
     <meta property="og:type" content="website">
-<meta property="og:title" content="分类">
-<meta property="og:url" content="http://example.com/categories/index.html">
+<meta property="og:title" content="Woods&#39;s Blog">
+<meta property="og:url" content="http://example.com/tags/SpringBoot/index.html">
 <meta property="og:site_name" content="Woods&#39;s Blog">
 <meta property="og:locale" content="zh_CN">
 <meta property="article:author" content="WoodsWu">
@@ -49,7 +49,7 @@
 
 
   <div class='l_body' id='start'>
-    <aside class='l_left' layout='categories'>
+    <aside class='l_left' layout=''>
     
 
 
@@ -104,7 +104,8 @@
       
 
   
-  
+
+
   <div class='nav-wrap'>
   <nav class='sub post cap'>
     
@@ -112,12 +113,12 @@
     
     
       
-        <a class='active' href='/categories'>分类</a>
+        <a href='/categories'>分类</a>
       
     
     
       
-        <a href='/tags'>标签</a>
+        <a class='active' href='/tags'>标签：SpringBoot</a>
       
     
     
@@ -128,53 +129,21 @@
   </nav>
 </div>
 
-  <div class='post-list'>
-    <article class='post-card' id='cats'>
-      
-        <div>
-          <a class="cat" href="/categories/Java%E5%9F%BA%E7%A1%80%E7%9F%A5%E8%AF%86/">
-            <span class='name'>Java基础知识</span>
-            <span class='badge'>(1)</span>
-          </a>
-        </div>
-      
-        <div>
-          <a class="cat" href="/categories/Spring/">
-            <span class='name'>Spring</span>
-            <span class='badge'>(2)</span>
-          </a>
-        </div>
-      
-        <div>
-          <a class="cat" href="/categories/SpringBoot/">
-            <span class='name'>SpringBoot</span>
-            <span class='badge'>(3)</span>
-          </a>
-        </div>
-      
-        <div>
-          <a class="cat" href="/categories/%E5%88%86%E5%B8%83%E5%BC%8F%E6%96%87%E4%BB%B6%E7%B3%BB%E7%BB%9F/">
-            <span class='name'>分布式文件系统</span>
-            <span class='badge'>(1)</span>
-          </a>
-        </div>
-      
-        <div>
-          <a class="cat" href="/categories/%E6%8E%92%E5%BA%8F%E7%AE%97%E6%B3%95/">
-            <span class='name'>排序算法</span>
-            <span class='badge'>(1)</span>
-          </a>
-        </div>
-      
-        <div>
-          <a class="cat" href="/categories/%E6%B3%A8%E5%86%8C%E4%B8%AD%E5%BF%83/">
-            <span class='name'>注册中心</span>
-            <span class='badge'>(1)</span>
-          </a>
-        </div>
-      
-    </article>
-  </div>
+  <div class="post-list post"><a class="post-card post " href="/2022/06/21/SpringBoot%E7%9A%84%E5%9B%9B%E7%A7%8D%E9%89%B4%E6%9D%83%E6%96%B9%E5%BC%8F/"><article class="md">
+<h2 class="post-title">SpringBoot的四种鉴权方式</h2><div class="excerpt"><p>一、传统AOP切面类12345678910111213@Aspect  public class WhitelistAspect &#123;        @Before(value = &quot;whitelistPointcut() &amp;&amp; @annotation(whitelist)&quot;)   public void checkAppkeyWhitelist(...</p></div><div class="meta cap"><span class="cap" id="post-meta">发布于&nbsp;<time datetime="2022-06-21T02:31:59.523Z">2022-06-21</time></span><span class="cap breadcrumb">SpringBoot</span><div>
+</article></a><a class="post-card post " href="/2022/06/09/Spring%E7%AC%94%E8%AE%B0/"><article class="md">
+<h2 class="post-title">SpringBoot自动配置(启动流程)</h2><div class="excerpt"><p>一、核心思想1.IocIoC Inversion of Control (控制反转/反转控制)，注意它是一个技术思想，不是一个技术实现
+描述的事情:Java开发领域对象的创建，管理的问题 传统开发方式:比如类A依赖于类B，往往会在类A中new
+一个B的对象
+IoC思想下开发方式:我们不用自己去new对象了，而是由IoC容器(Spring框架)去帮助我们实例化对 象并且管理它，我们需要使用哪个...</p></div><div class="meta cap"><span class="cap" id="post-meta">发布于&nbsp;<time datetime="2022-06-09T07:37:05.780Z">2022-06-09</time></span><span class="cap breadcrumb">SpringBoot</span><div>
+</article></a><a class="post-card post " href="/2021/10/31/SpringBoot%E8%87%AA%E5%8A%A8%E9%85%8D%E7%BD%AE%E6%B5%85%E6%9E%90/"><article class="md">
+<h2 class="post-title">SpringBoot自动配置(启动流程)</h2><div class="excerpt"><p>一、应用的入口是SpringBoot启动类启动类位置在项目的根目录，为什么要在根目录？启动类的main方法启动的时候，项目主程序启动类要定义在最外层的根目录位 置，然后在根目录位置内部建立子包和类进行业务开发，这样才能够保证定义的类能够被组件扫描器扫描
+可被扫描的组件有哪些？@Component，@Controller，@Service，@Repository，等等具体作用就不介绍了，用过s...</p></div><div class="meta cap"><span class="cap" id="post-meta">发布于&nbsp;<time datetime="2021-10-31T08:33:52.704Z">2021-10-31</time></span><span class="cap breadcrumb">SpringBoot</span><div>
+</article></a></div>
+  
+
+
+
 
 
       

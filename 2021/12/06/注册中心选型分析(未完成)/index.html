@@ -20,12 +20,12 @@
   <title>注册中心选型分析 - Woods's Blog</title>
 
   
-    <meta name="description" content="一. 认识注册中心注册中心的出现​        本来在后端的领域中是没有注册中心这个概念的，因为原来的单体应用架构，代码之间的各种调用都是在同一台服务器，所以不需要。 ​        但是随着服务上云，分布式应用的兴起，就诞生了现在的微服务的架构模式，不同的业务服务放在不同的云服务器上面，所以就会有个非常显著的问题，不同的服务器之间的业务接口怎么相互调用，最简单的，直接用http实现相互的调用">
+    <meta name="description" content="一. 认识注册中心注册中心的出现本来在后端的领域中是没有注册中心这个概念的，因为原来的单体应用架构，代码之间的各种调用都是在同一台服务器，所以不需要。 但是随着服务上云，分布式应用的兴起，就诞生了现在的微服务的架构模式，不同的业务服务放在不同的云服务器上面，所以就会有个非常显著的问题，不同的服务器之间的业务接口怎么相互调用，最简单的，直接用http实现相互的调用，这样子的确可以解决一定的问题。 h">
 <meta property="og:type" content="article">
 <meta property="og:title" content="注册中心选型分析">
 <meta property="og:url" content="http://example.com/2021/12/06/%E6%B3%A8%E5%86%8C%E4%B8%AD%E5%BF%83%E9%80%89%E5%9E%8B%E5%88%86%E6%9E%90(%E6%9C%AA%E5%AE%8C%E6%88%90)/index.html">
 <meta property="og:site_name" content="Woods&#39;s Blog">
-<meta property="og:description" content="一. 认识注册中心注册中心的出现​        本来在后端的领域中是没有注册中心这个概念的，因为原来的单体应用架构，代码之间的各种调用都是在同一台服务器，所以不需要。 ​        但是随着服务上云，分布式应用的兴起，就诞生了现在的微服务的架构模式，不同的业务服务放在不同的云服务器上面，所以就会有个非常显著的问题，不同的服务器之间的业务接口怎么相互调用，最简单的，直接用http实现相互的调用">
+<meta property="og:description" content="一. 认识注册中心注册中心的出现本来在后端的领域中是没有注册中心这个概念的，因为原来的单体应用架构，代码之间的各种调用都是在同一台服务器，所以不需要。 但是随着服务上云，分布式应用的兴起，就诞生了现在的微服务的架构模式，不同的业务服务放在不同的云服务器上面，所以就会有个非常显著的问题，不同的服务器之间的业务接口怎么相互调用，最简单的，直接用http实现相互的调用，这样子的确可以解决一定的问题。 h">
 <meta property="og:locale" content="zh_CN">
 <meta property="og:image" content="https://upload-images.jianshu.io/upload_images/15586926-b82ce5450c961512.png">
 <meta property="og:image" content="https://upload-images.jianshu.io/upload_images/15586926-d623049840d4d58e.png">
@@ -33,7 +33,7 @@
 <meta property="og:image" content="https://upload-images.jianshu.io/upload_images/15586926-e25b702c22139481.png">
 <meta property="og:image" content="https://learn.hashicorp.com/img/consul/reference-architecture/consul-singleDC-5node-reference-architecture.png">
 <meta property="article:published_time" content="2021-12-06T08:56:08.629Z">
-<meta property="article:modified_time" content="2022-02-06T12:40:18.016Z">
+<meta property="article:modified_time" content="2022-06-23T09:30:50.607Z">
 <meta property="article:author" content="WoodsWu">
 <meta property="article:tag" content="eureka,zookeeper,nacos,etcd">
 <meta name="twitter:card" content="summary">
@@ -88,27 +88,29 @@
 
 <article class='content md post'>
 <h1 class="article-title"><span>注册中心选型分析</span></h1>
-<h2 id="一-认识注册中心"><a href="#一-认识注册中心" class="headerlink" title="一. 认识注册中心"></a>一. 认识注册中心</h2><h3 id="注册中心的出现"><a href="#注册中心的出现" class="headerlink" title="注册中心的出现"></a>注册中心的出现</h3><p>​        本来在后端的领域中是没有注册中心这个概念的，因为原来的单体应用架构，代码之间的各种调用都是在同一台服务器，所以不需要。</p>
-<p>​        但是随着服务上云，分布式应用的兴起，就诞生了现在的微服务的架构模式，不同的业务服务放在不同的云服务器上面，所以就会有个非常显著的问题，不同的服务器之间的业务接口怎么相互调用，最简单的，直接用http实现相互的调用，这样子的确可以解决一定的问题。</p>
-<p>​    http接口是在接口不多、系统与系统交互较少的情况下，解决信息孤岛初期常使用的一种通信手段，优点就是简单、直接、开发方便。如果是一个大型的网站，内部子系统较多、接口非常多的情况下，RPC框架的好处就显示出来了：首先就是长链接，不必每次通信都要像http一样去3次握手什么的，<strong>减少了网络开销</strong>。</p>
-<p>​        好了，现在解决了服务之间业务接口的调用问题，我们的微服务是不是就可以平稳的运行在我们的服务器上面了呢？答案是NO！你调的那个服务是不是有问题，是否是健康的，拿到的数据是否可用？如果宕机的服务恢复了状态，怎么通知其他服务“我”可以被调用了？如果某个服务挂了，是否整体业务雪崩？……</p>
-<p>​        自此，由于系统的复杂性不断提高以及容器部署方式的推行，服务消费者的调用信息无法简单地通过静态配置文件来保存，服务发现的工具—— <strong>注册中心</strong> 由此诞生。</p>
-<p>​        注册中心可以实现<strong>「服务的注册」和「服务的发现」</strong>，服务的<strong>健康检查</strong>，<strong>服务的注销</strong>，服务状态变跟的同步等等，总之，有了注册中心我们的微服务才能变得<strong>易用</strong>，<strong>高可用</strong>起来。</p>
+<h2 id="一-认识注册中心"><a href="#一-认识注册中心" class="headerlink" title="一. 认识注册中心"></a>一. 认识注册中心</h2><h3 id="注册中心的出现"><a href="#注册中心的出现" class="headerlink" title="注册中心的出现"></a>注册中心的出现</h3><p>本来在后端的领域中是没有注册中心这个概念的，因为原来的单体应用架构，代码之间的各种调用都是在同一台服务器，所以不需要。</p>
+<p>但是随着服务上云，分布式应用的兴起，就诞生了现在的微服务的架构模式，不同的业务服务放在不同的云服务器上面，所以就会有个非常显著的问题，不同的服务器之间的业务接口怎么相互调用，最简单的，直接用http实现相互的调用，这样子的确可以解决一定的问题。</p>
+<p>http接口是在接口不多、系统与系统交互较少的情况下，解决信息孤岛初期常使用的一种通信手段，优点就是简单、直接、开发方便。如果是一个大型的网站，内部子系统较多、接口非常多的情况下，RPC框架的好处就显示出来了：首先就是长链接，不必每次通信都要像http一样去3次握手什么的，<strong>减少了网络开销</strong>。</p>
+<p>好了，现在解决了服务之间业务接口的调用问题，我们的微服务是不是就可以平稳的运行在我们的服务器上面了呢？答案是NO！你调的那个服务是不是有问题，是否是健康的，拿到的数据是否可用？如果宕机的服务恢复了状态，怎么通知其他服务“我”可以被调用了？如果某个服务挂了，是否整体业务雪崩？……</p>
+<p>自此，由于系统的复杂性不断提高以及容器部署方式的推行，服务消费者的调用信息无法简单地通过静态配置文件来保存，服务发现的工具—— <strong>注册中心</strong> 由此诞生。</p>
+<p>注册中心可以实现<strong>「服务的注册」和「服务的发现」</strong>，服务的<strong>健康检查</strong>，<strong>服务的注销</strong>，<strong>服务状态变跟</strong>的同步等等，总之，有了注册中心我们的微服务才能变得<strong>易用</strong>，<strong>高可用</strong>起来。</p>
 <h3 id="注册中心几个主要的功能"><a href="#注册中心几个主要的功能" class="headerlink" title="注册中心几个主要的功能"></a>注册中心几个主要的功能</h3><ol>
 <li><p><strong>服务注册</strong></p>
-<p>服务提供方将自身路由信息发布到注册中心，供消费方获取，用于与提供方建立连接并发起调用</p>
-<p><strong>路由信息</strong>：注册服务节点ip信息监听端口等路由信息</p>
-<p><strong>服务信息</strong>：有序列化规则，路由规则，节点权重等</p>
+<p>作用：服务提供方将自身路由信息发布到注册中心，供消费方获取，用于与提供方建立连接并发起调用</p>
+<p><strong>需要提供给注册中心的内容：</strong></p>
+<p>（1）<strong>路由信息</strong>：注册服务节点ip信息监听端口等路由信息</p>
+<p>（2）<strong>服务信息</strong>：有序列化规则，路由规则，节点权重等</p>
 </li>
 <li><p><strong>服务发现</strong></p>
-<p>服务消费方通过访问注册中心获取服务提供方节点路由信息</p>
-<p><strong>启动拉取</strong>：服务消费方启动后，从注册中心拉取提供方节点列表，建立连接，进行RPC调用</p>
-<p><strong>通知回调</strong>：接收注册中心变更通知，重新获取数据，更新节点列表</p>
-<p><strong>轮询拉取</strong>：服务消费方运行过程中定时拉取服务提供方节点列表，用来更新本地数据</p>
+<p>作用：服务消费方通过访问注册中心获取服务提供方节点路由信息</p>
+<p><strong>获取服务提供方节点路由信息的时机：</strong></p>
+<p>（1）<strong>启动拉取</strong>：服务消费方启动后，从注册中心拉取提供方节点列表，建立连接，进行RPC调用</p>
+<p>（2）<strong>通知回调</strong>：接收注册中心变更通知，重新获取数据，更新节点列表</p>
+<p>（3）<strong>轮询拉取</strong>：服务消费方运行过程中定时拉取服务提供方节点列表，用来更新本地数据</p>
 </li>
 <li><p><strong>健康检查</strong></p>
-<p>确保已注册节点的健康度，能够及时剔除失效节点，保证服务发现的正确性。</p>
-<p><strong>失效原因</strong>：服务重启、服务假死、异常终止</p>
+<p>作用：确保已注册节点的健康度，能够及时剔除失效节点，保证服务发现的正确性。</p>
+<p><strong>服务失效原因</strong>：服务重启、服务假死、异常终止</p>
 <p><strong>解决方案</strong>：上报心跳，服务探测</p>
 </li>
 <li><p><strong>变更通知</strong></p>
@@ -195,7 +197,7 @@
 </tbody></table>
 <h2 id="三-专业名词介绍"><a href="#三-专业名词介绍" class="headerlink" title="三. 专业名词介绍"></a>三. 专业名词介绍</h2><h3 id="1-CAP协议"><a href="#1-CAP协议" class="headerlink" title="1.CAP协议"></a>1.CAP协议</h3><h5 id="1-1-一致性-Consistency"><a href="#1-1-一致性-Consistency" class="headerlink" title="1.1 一致性 (Consistency)"></a>1.1 <strong>一致性 (Consistency)</strong></h5><p>​        所有节点访问时都是同一份最新的数据副本</p>
 <h5 id="1-2-可用性-Availability"><a href="#1-2-可用性-Availability" class="headerlink" title="1.2 可用性 (Availability)"></a>1.2 <strong>可用性 (Availability)</strong></h5><p>​        每次请求都能获取到非错的响应，但是不保证获取的数据为最新数据，换言之，系统中非故障节点收到的每个请求都必须有响应. 在可用系统中，如果我们的客户端向服务器发送请求，并且服务器未崩溃，则服务器必须最终响应客户端，不允许服务器忽略客户的请求</p>
-<h5 id="1-3-分区容错性-Partition-tolerance"><a href="#1-3-分区容错性-Partition-tolerance" class="headerlink" title="1.3 分区容错性 (Partition tolerance)"></a>1.3 <strong>分区容错性 (Partition tolerance)</strong></h5><p>​        分布式系统在遇到任何网络分区故障的时候，仍然能够对外提供满足一致 性和可用性的服务，除非整个网络环境都发生了故障</p>
+<h5 id="1-3-分区容错性-Partition-tolerance"><a href="#1-3-分区容错性-Partition-tolerance" class="headerlink" title="1.3 分区容错性 (Partition tolerance)"></a>1.3 <strong>分区容错性 (Partition tolerance)</strong></h5><p>分布式系统在遇到任何网络分区故障的时候，仍然能够对外提供满足一致 性和可用性的服务，除非整个网络环境都发生了故障</p>
 <h5 id="CA"><a href="#CA" class="headerlink" title="CA"></a>CA</h5><p>关注一致性和可用性，它需要非常严格的全体一致的协议。CA 系统不能容忍网络错误或节点错误，一旦出现这样的问题，整个系统就会拒绝写请求，因为它并不 知道对面的那个结点是否挂掉了，还是只是网络问题。唯一安全的做法就是把自己变成只读的的单机系统。</p>
 <h5 id="CP"><a href="#CP" class="headerlink" title="CP"></a><strong>CP</strong></h5><p>关注一致性和分区容忍性。它关注的是系统里大多数人 的一致性协议。这样的系统只需要<strong>保证大多数结点数据一致</strong>，而少数的结点会在没有同步到最新版 本的数据时变成不可用的状态。这样能够提供一部分的可用性。</p>
 <h5 id="AP"><a href="#AP" class="headerlink" title="AP"></a><strong>AP</strong></h5><p>这样的系统关心可用性和分区容忍性。因此，这样的系统 不能达成一致性，<strong>需要给出数据冲突，给出数据冲突就需要维护数据版本</strong>。</p>
@@ -273,11 +275,11 @@
 </li>
 </ol>
 <p>3.2 三阶段提交协议</p>
-<h2 id="四-逐个介绍"><a href="#四-逐个介绍" class="headerlink" title="四. 逐个介绍"></a>四. 逐个介绍</h2><h3 id="1-Eureka"><a href="#1-Eureka" class="headerlink" title="1. Eureka"></a>1. Eureka</h3><p>​        Spring-Cloud官方文档，搭配的注册中心就是用的eureka，属于Netflix公司的开源项目，但是2.0版本闭源了，停止更新和维护了，所以你如果要想能够不断更新和维护的注册中心的话，建议选择其他的注册中心。但是1.0的版本，对于中小型公司的体量，依然是足够了。</p>
+<h2 id="四-逐个介绍"><a href="#四-逐个介绍" class="headerlink" title="四. 逐个介绍"></a>四. 逐个介绍</h2><h3 id="1-Eureka"><a href="#1-Eureka" class="headerlink" title="1. Eureka"></a>1. Eureka</h3><p>Spring-Cloud官方文档，搭配的注册中心就是用的eureka，属于Netflix公司的开源项目，但是2.0版本闭源了，停止更新和维护了，所以你如果要想能够不断更新和维护的注册中心的话，建议选择其他的注册中心。但是1.0的版本，对于中小型公司的体量，依然是足够了。</p>
 <p>​        </p>
-<h3 id="2-Nacos"><a href="#2-Nacos" class="headerlink" title="2. Nacos"></a>2. Nacos</h3><h3 id="3-Etcd"><a href="#3-Etcd" class="headerlink" title="3. Etcd"></a>3. Etcd</h3><p>​        Etcd是Kubernetes用于存储集群各种状态信息（配置信息，运行）一个很重要的组件。 是兼具一致性和高可用性的键值对数据库，可以作为保存 Kubernetes 所有集群数据的后台数据库。在Kubernetes的世界里面，etcd是<strong>服务发现</strong>，<strong>集群状态存储</strong>以及其<strong>配置</strong>的基石。</p>
-<p>​        如果微服务是通过K8s管理容器来部署微服务的话，etcd算是比较好的方案，因为etcd本身就属于K8s的组件，通过k8s service组件的方式提供服务的注册与发现，比 springboot 原生提供的 eureka、阿里的 nacos、zk 来作分布式的服务注册与发现要简单的多。减轻系统的繁重，以及避免了系统的冗余。</p>
-<h3 id="4-Consul"><a href="#4-Consul" class="headerlink" title="4.Consul"></a>4.Consul</h3><p>​        在google上面看国外程序员对注册中心这一块，认可程度最高的好像就是这个Consul了，因为对这个Consul了解的不多，所以有点小惊讶，但是看受欢迎程度，这个组件被认可肯定是有原因的，但是国内用到的企业并不多，简单略过去。</p>
+<h3 id="2-Nacos"><a href="#2-Nacos" class="headerlink" title="2. Nacos"></a>2. Nacos</h3><h3 id="3-Etcd"><a href="#3-Etcd" class="headerlink" title="3. Etcd"></a>3. Etcd</h3><p>Etcd是Kubernetes用于存储集群各种状态信息（配置信息，运行）一个很重要的组件。 是兼具一致性和高可用性的键值对数据库，可以作为保存 Kubernetes 所有集群数据的后台数据库。在Kubernetes的世界里面，etcd是<strong>服务发现</strong>，<strong>集群状态存储</strong>以及其<strong>配置</strong>的基石。</p>
+<p>如果微服务是通过K8s管理容器来部署微服务的话，etcd算是比较好的方案，因为etcd本身就属于K8s的组件，通过k8s service组件的方式提供服务的注册与发现，比 springboot 原生提供的 eureka、阿里的 nacos、zk 来作分布式的服务注册与发现要简单的多。减轻系统的繁重，以及避免了系统的冗余。</p>
+<h3 id="4-Consul"><a href="#4-Consul" class="headerlink" title="4.Consul"></a>4.Consul</h3><p>在google上面看国外程序员对注册中心这一块，认可程度最高的好像就是这个Consul了，因为对这个Consul了解的不多，所以有点小惊讶，但是看受欢迎程度，这个组件被认可肯定是有原因的，但是国内用到的企业并不多，简单略过去。</p>
 <p><strong>具有最大弹性的单个 Consul 集群的推荐架构</strong></p>
 <p><img class="lazy" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAABGdBTUEAALGPC/xhBQAAADhlWElmTU0AKgAAAAgAAYdpAAQAAAABAAAAGgAAAAAAAqACAAQAAAABAAAAAaADAAQAAAABAAAAAQAAAADa6r/EAAAAC0lEQVQIHWNgAAIAAAUAAY27m/MAAAAASUVORK5CYII=" data-src="https://learn.hashicorp.com/img/consul/reference-architecture/consul-singleDC-5node-reference-architecture.png" alt="具有最大弹性的单个 Consul 集群的推荐架构"></p>
 <h4 id="优点"><a href="#优点" class="headerlink" title="优点"></a>优点</h4><h4 id="缺点"><a href="#缺点" class="headerlink" title="缺点"></a>缺点</h4><ul>
