@@ -79,7 +79,7 @@
       <p><strong>以后想要干啥？</strong></p>
 
     
-      <p>目前工作两年，后端和运维都想沾点，准备再干五年试试！</p>
+      <p>目前工作两年，后端和运维都想沾点，准备再干五年试试</p>
 
     
       <br>
@@ -135,6 +135,13 @@
 </article></a><a class="post-card post " href="/2022/06/21/%E6%B3%A8%E8%A7%A3Configuration%E5%92%8C%E6%B3%A8%E8%A7%A3Component%E7%94%A8%E6%B3%95%E5%92%8C%E5%BC%82%E5%90%8C/"><article class="md">
 <h2 class="post-title">Configuration和Component用法和异同</h2><div class="excerpt"><p>一、各自在代码中的定义先看一下Spring中的类定义
 123456789@Target(ElementType.TYPE)@Retention(RetentionPolicy.RUNTIME)@Documented@Componentpublic @interface Configuration &#123;   @AliasFor(annotation = Component.class)...</p></div><div class="meta cap"><span class="cap" id="post-meta">发布于&nbsp;<time datetime="2022-06-21T02:31:59.523Z">2022-06-21</time></span><span class="cap breadcrumb">Spring</span><div>
+</article></a><a class="post-card post " href="/2022/06/21/docker%E6%90%AD%E5%BB%BAcanal-server%E5%92%8Ccanal-admin/"><article class="md">
+<h2 class="post-title">docker搭建canal-server和canal-admin</h2><div class="excerpt"><p>一、搭建有binlog功能的mysql1.1 先建两文件夹我是使用docker来搭建，在服务器上建这么两个目录，用来挂载docker里面的mysql的配置文件，和mysql的数据存储, 后面docker run要用
+12/etc/mysql   ##挂载mysql的配置文件/opt/mysql   ##挂载mysql的数据存储
+
+
+
+1.2 拉取docker 镜像1docker pull m...</p></div><div class="meta cap"><span class="cap" id="post-meta">发布于&nbsp;<time datetime="2022-06-21T02:31:59.523Z">2022-06-21</time></span><span class="cap breadcrumb">canal</span><div>
 </article></a><a class="post-card post " href="/2022/06/09/Spring%E7%AC%94%E8%AE%B0/"><article class="md">
 <h2 class="post-title">SpringBoot自动配置(启动流程)</h2><div class="excerpt"><p>一、核心思想1.IocIoC Inversion of Control (控制反转/反转控制)，注意它是一个技术思想，不是一个技术实现
 描述的事情:Java开发领域对象的创建，管理的问题 传统开发方式:比如类A依赖于类B，往往会在类A中new
