@@ -17,18 +17,18 @@
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
   <meta name="theme-color" content="#f8f8f8">
-  <title>SpringBoot自动配置(启动流程) - Woods's Blog</title>
+  <title>SpringBoot笔记 - Woods's Blog</title>
 
   
     <meta name="description" content="一、核心思想1.IocIoC Inversion of Control (控制反转&#x2F;反转控制)，注意它是一个技术思想，不是一个技术实现 描述的事情:Java开发领域对象的创建，管理的问题 传统开发方式:比如类A依赖于类B，往往会在类A中new 一个B的对象 IoC思想下开发方式:我们不用自己去new对象了，而是由IoC容器(Spring框架)去帮助我们实例化对 象并且管理它，我们需要使用哪个对象，">
 <meta property="og:type" content="article">
-<meta property="og:title" content="SpringBoot自动配置(启动流程)">
+<meta property="og:title" content="SpringBoot笔记">
 <meta property="og:url" content="https://github.com/2022/06/09/Spring%E7%AC%94%E8%AE%B0/index.html">
 <meta property="og:site_name" content="Woods&#39;s Blog">
 <meta property="og:description" content="一、核心思想1.IocIoC Inversion of Control (控制反转&#x2F;反转控制)，注意它是一个技术思想，不是一个技术实现 描述的事情:Java开发领域对象的创建，管理的问题 传统开发方式:比如类A依赖于类B，往往会在类A中new 一个B的对象 IoC思想下开发方式:我们不用自己去new对象了，而是由IoC容器(Spring框架)去帮助我们实例化对 象并且管理它，我们需要使用哪个对象，">
 <meta property="og:locale" content="zh_CN">
 <meta property="article:published_time" content="2022-06-09T07:37:05.780Z">
-<meta property="article:modified_time" content="2022-06-16T01:44:22.547Z">
+<meta property="article:modified_time" content="2022-11-14T09:30:06.414Z">
 <meta property="article:author" content="WoodsWu">
 <meta property="article:tag" content="SpringBoot">
 <meta name="twitter:card" content="summary">
@@ -81,7 +81,7 @@
 <div class="bread-nav fs12"><div id="breadcrumb"><a class="cap breadcrumb" href="/">Woods's Blog</a><span class="sep"></span><a class="cap breadcrumb" href="/">文章</a><span class="sep"></span><a class="cap breadcrumb-link" href="/categories/SpringBoot/">SpringBoot</a></div><div id="post-meta">发布于&nbsp;<time datetime="2022-06-09T07:37:05.780Z">2022-06-09</time></div></div>
 
 <article class='content md post'>
-<h1 class="article-title"><span>SpringBoot自动配置(启动流程)</span></h1>
+<h1 class="article-title"><span>SpringBoot笔记</span></h1>
 <h3 id="一、核心思想"><a href="#一、核心思想" class="headerlink" title="一、核心思想"></a>一、核心思想</h3><h4 id="1-Ioc"><a href="#1-Ioc" class="headerlink" title="1.Ioc"></a>1.Ioc</h4><p>IoC <strong>Inversion of Control</strong> (控制反转/反转控制)，注意它是一个技术思想，不是一个技术实现</p>
 <p><strong>描述的事情</strong>:Java开发领域对象的创建，管理的问题 传统开发方式:比如类A依赖于类B，往往会在类A中new</p>
 <p>一个B的对象</p>
