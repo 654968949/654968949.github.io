@@ -17,12 +17,12 @@
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
   <meta name="theme-color" content="#f8f8f8">
-  <title>标签：canal - Woods's Blog</title>
+  <title>标签：阻塞队列 - Woods's Blog</title>
 
   
     <meta property="og:type" content="website">
 <meta property="og:title" content="Woods&#39;s Blog">
-<meta property="og:url" content="https://github.com/tags/canal/index.html">
+<meta property="og:url" content="https://github.com/tags/%E9%98%BB%E5%A1%9E%E9%98%9F%E5%88%97/index.html">
 <meta property="og:site_name" content="Woods&#39;s Blog">
 <meta property="og:locale" content="zh_CN">
 <meta property="article:author" content="WoodsWu">
@@ -112,7 +112,7 @@
     
     
       
-        <a class='active' href='/tags'>标签：canal</a>
+        <a class='active' href='/tags'>标签：阻塞队列</a>
       
     
     
@@ -123,13 +123,8 @@
   </nav>
 </div>
 
-  <div class="post-list post"><a class="post-card post " href="/2022/06/21/docker%E6%90%AD%E5%BB%BAcanal-server%E5%92%8Ccanal-admin/"><article class="md">
-<h2 class="post-title">docker搭建canal-server和canal-admin</h2><div class="excerpt"><p>一、搭建有binlog功能的mysql1.1 先建两文件夹我是使用docker来搭建，在服务器上建这么两个目录，用来挂载docker里面的mysql的配置文件，和mysql的数据存储, 后面docker run要用
-12/etc/mysql   ##挂载mysql的配置文件/opt/mysql   ##挂载mysql的数据存储
-
-
-
-1.2 拉取docker 镜像1docker pull m...</p></div><div class="meta cap"><span class="cap" id="post-meta">发布于&nbsp;<time datetime="2022-06-21T02:31:59.523Z">2022-06-21</time></span><span class="cap breadcrumb">canal</span><div>
+  <div class="post-list post"><a class="post-card post " href="/2022/06/21/%E7%BA%BF%E7%A8%8B%E6%B1%A0%E7%9A%84%E5%9B%9B%E7%A7%8D%E9%98%BB%E5%A1%9E%E9%98%9F%E5%88%97%E6%B5%85%E8%A7%A3/"><article class="md">
+<h2 class="post-title">线程池的四种阻塞队列浅解</h2><div class="excerpt"><p>一. ArrayBlockingQueue内部使用数组存储元素，利用reentrantlock实现线程安全，在创建的时候必须指定容量，之后也不可以再扩容了，在构造函数中可以指定是否公平，第一个参数是容量，第二个参数是是否公平。正如ReentrantLock一样，如果ArrayBlockingQueue被设置为非公平的，那么就存在插队的可能；如果设置为公平的，那么等待了最长时间的线程会被优先处...</p></div><div class="meta cap"><span class="cap" id="post-meta">发布于&nbsp;<time datetime="2022-06-21T02:31:59.523Z">2022-06-21</time></span><span class="cap breadcrumb">异步编程</span><div>
 </article></a></div>
   
 
