@@ -1,328 +1,46 @@
-<!DOCTYPE html>
-<html lang='zh-CN'>
-
-<head>
-  <meta name="generator" content="Hexo 5.4.0">
-  <meta charset="utf-8">
-  
-
-  <meta http-equiv='x-dns-prefetch-control' content='on' />
-  <link rel='dns-prefetch' href='https://cdn.jsdelivr.net'>
-  <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
-
-  <meta name="renderer" content="webkit">
-  <meta name="force-rendering" content="webkit">
-  <meta http-equiv="X-UA-Compatible" content="IE=Edge,chrome=1">
-  <meta name="HandheldFriendly" content="True" >
-  <meta name="apple-mobile-web-app-capable" content="yes">
-  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-  <meta name="theme-color" content="#f8f8f8">
-  <title>SpringBoot自动配置浅析 - Woods's Blog</title>
-
-  
-    <meta name="description" content="一、应用的入口是SpringBoot启动类启动类位置在项目的根目录，为什么要在根目录？启动类的main方法启动的时候，项目主程序启动类要定义在最外层的根目录位 置，然后在根目录位置内部建立子包和类进行业务开发，这样才能够保证定义的类能够被组件扫描器扫描 可被扫描的组件有哪些？@Component，@Controller，@Service，@Repository，等等具体作用就不介绍了，用过spri">
-<meta property="og:type" content="article">
-<meta property="og:title" content="SpringBoot自动配置浅析">
-<meta property="og:url" content="https://github.com/2021/10/31/SpringBoot%E8%87%AA%E5%8A%A8%E9%85%8D%E7%BD%AE%E6%B5%85%E6%9E%90/index.html">
-<meta property="og:site_name" content="Woods&#39;s Blog">
-<meta property="og:description" content="一、应用的入口是SpringBoot启动类启动类位置在项目的根目录，为什么要在根目录？启动类的main方法启动的时候，项目主程序启动类要定义在最外层的根目录位 置，然后在根目录位置内部建立子包和类进行业务开发，这样才能够保证定义的类能够被组件扫描器扫描 可被扫描的组件有哪些？@Component，@Controller，@Service，@Repository，等等具体作用就不介绍了，用过spri">
-<meta property="og:locale" content="zh_CN">
-<meta property="article:published_time" content="2021-10-31T08:33:52.704Z">
-<meta property="article:modified_time" content="2022-11-14T09:29:52.949Z">
-<meta property="article:author" content="WoodsWu">
-<meta property="article:tag" content="SpringBoot">
-<meta name="twitter:card" content="summary">
-  
-  
-
-  <!-- feed -->
-  
-
-  
-    
-<link rel="stylesheet" href="/css/main.css">
-
-  
-
-  
-
-  
-</head>
-
-<body>
-  
-
-
-  <div class='l_body' id='start'>
-    <aside class='l_left' layout='post'>
-    
-
-
-<header class="header">
-
-<div class="logo-wrap"><a class="avatar" href="/about/"><div class="bg" style="opacity:0;background-image:url(https://cdn.jsdelivr.net/gh/cdn-x/placeholder@1.0.2/avatar/round/rainbow64@3x.webp);"></div><img no-lazy class="avatar" src="https://upload.jianshu.io/users/upload_avatars/15586926/58772875-84f9-4db7-9deb-f3d0fc2b57fe.png" onerror="javascript:this.classList.add('error');this.src='https://cdn.jsdelivr.net/gh/cdn-x/placeholder@1.0.1/image/2659360.svg';"></a><a class="title" href="/"><div class="main">Woods's Blog</div></a></div>
-<nav class="menu dis-select"><a class="nav-item active" href="/">文章</a></nav></header>
-
-<div class="widgets">
-
-<div class="widget-wrap single" id="toc"><div class="widget-header cap dis-select"><span class="name">本文目录</span></div><div class="widget-body fs14"><div class="doc-tree active"><ol class="toc"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%B8%80%E3%80%81%E5%BA%94%E7%94%A8%E7%9A%84%E5%85%A5%E5%8F%A3%E6%98%AFSpringBoot%E5%90%AF%E5%8A%A8%E7%B1%BB"><span class="toc-text">一、应用的入口是SpringBoot启动类</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#%E5%90%AF%E5%8A%A8%E7%B1%BB%E4%BD%8D%E7%BD%AE%E5%9C%A8%E9%A1%B9%E7%9B%AE%E7%9A%84%E6%A0%B9%E7%9B%AE%E5%BD%95%EF%BC%8C%E4%B8%BA%E4%BB%80%E4%B9%88%E8%A6%81%E5%9C%A8%E6%A0%B9%E7%9B%AE%E5%BD%95%EF%BC%9F"><span class="toc-text">启动类位置在项目的根目录，为什么要在根目录？</span></a><ol class="toc-child"><li class="toc-item toc-level-5"><a class="toc-link" href="#%E5%8F%AF%E8%A2%AB%E6%89%AB%E6%8F%8F%E7%9A%84%E7%BB%84%E4%BB%B6%E6%9C%89%E5%93%AA%E4%BA%9B%EF%BC%9F"><span class="toc-text">可被扫描的组件有哪些？</span></a></li></ol></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%BA%8C%E3%80%81-SpringBootApplication%E5%8C%85%E5%90%AB%E7%9A%84%E4%B8%89%E4%B8%AA%E9%87%8D%E8%A6%81%E6%B3%A8%E8%A7%A3"><span class="toc-text">二、@SpringBootApplication包含的三个重要注解</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#1-SpringBootConfiguration"><span class="toc-text">1. @SpringBootConfiguration</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#2-EableAutoConfiguration"><span class="toc-text">2.@EableAutoConfiguration</span></a><ol class="toc-child"><li class="toc-item toc-level-5"><a class="toc-link" href="#%EF%BC%881%EF%BC%89-AutoConfigurationPackage"><span class="toc-text">（1）@AutoConfigurationPackage</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#%EF%BC%882%EF%BC%89-Import-AutoConfigurationImportSelector-class"><span class="toc-text">（2）@Import(AutoConfigurationImportSelector.class)</span></a></li></ol></li><li class="toc-item toc-level-4"><a class="toc-link" href="#3-ComponentScan"><span class="toc-text">3.@ComponentScan</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%B8%89%E3%80%81%E5%BA%95%E5%B1%82%E5%AE%9E%E7%8E%B0%E8%87%AA%E5%8A%A8%E9%85%8D%E7%BD%AE%E7%9A%84%E6%AD%A5%E9%AA%A4"><span class="toc-text">三、底层实现自动配置的步骤</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%9B%9B%E3%80%81%E6%95%B4%E4%BD%93%E5%90%AF%E5%8A%A8%E6%B5%81%E7%A8%8B"><span class="toc-text">四、整体启动流程</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#1-%E8%8E%B7%E5%8F%96%E5%B9%B6%E5%90%AF%E5%8A%A8%E7%9B%91%E5%90%AC%E5%99%A8"><span class="toc-text">1.获取并启动监听器</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#2-%E6%A0%B9%E6%8D%AESpringApplicationRunListeners%E4%BB%A5%E5%8F%8A%E5%8F%82%E6%95%B0%E6%9D%A5%E5%87%86%E5%A4%87%E7%8E%AF%E5%A2%83"><span class="toc-text">2.根据SpringApplicationRunListeners以及参数来准备环境</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#3-%E5%88%9B%E5%BB%BASpring%E5%AE%B9%E5%99%A8"><span class="toc-text">3.创建Spring容器</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#4-Spring%E5%AE%B9%E5%99%A8%E5%89%8D%E7%BD%AE%E5%A4%84%E7%90%86"><span class="toc-text">4.Spring容器前置处理</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#5-%E5%88%B7%E6%96%B0%E5%AE%B9%E5%99%A8"><span class="toc-text">5.刷新容器</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#6-Spring%E5%AE%B9%E5%99%A8%E5%90%8E%E7%BD%AE%E5%A4%84%E7%90%86"><span class="toc-text">6.Spring容器后置处理</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#7-%E5%8F%91%E5%87%BA%E7%BB%93%E6%9D%9F%E6%89%A7%E8%A1%8C%E7%9A%84%E4%BA%8B%E4%BB%B6"><span class="toc-text">7.发出结束执行的事件</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#8-%E6%89%A7%E8%A1%8CRunners"><span class="toc-text">8.执行Runners</span></a></li></ol></li></ol></div></div></div>
-
-
-</div>
-
-
-    </aside>
-    <div class='l_main'>
-      
-
-      
-
-
-<div class="bread-nav fs12"><div id="breadcrumb"><a class="cap breadcrumb" href="/">Woods's Blog</a><span class="sep"></span><a class="cap breadcrumb" href="/">文章</a><span class="sep"></span><a class="cap breadcrumb-link" href="/categories/SpringBoot/">SpringBoot</a></div><div id="post-meta">发布于&nbsp;<time datetime="2021-10-31T08:33:52.704Z">2021-10-31</time></div></div>
-
-<article class='content md post'>
-<h1 class="article-title"><span>SpringBoot自动配置浅析</span></h1>
-<h3 id="一、应用的入口是SpringBoot启动类"><a href="#一、应用的入口是SpringBoot启动类" class="headerlink" title="一、应用的入口是SpringBoot启动类"></a>一、应用的入口是SpringBoot启动类</h3><h4 id="启动类位置在项目的根目录，为什么要在根目录？"><a href="#启动类位置在项目的根目录，为什么要在根目录？" class="headerlink" title="启动类位置在项目的根目录，为什么要在根目录？"></a>启动类位置在项目的根目录，为什么要在根目录？</h4><p>启动类的main方法启动的时候，项目主程序启动类要定义在最外层的根目录位 置，然后在根目录位置内部建立子包和类进行业务开发，这样才能够<strong>保证定义的类能够被组件扫描器扫描</strong></p>
-<h5 id="可被扫描的组件有哪些？"><a href="#可被扫描的组件有哪些？" class="headerlink" title="可被扫描的组件有哪些？"></a>可被扫描的组件有哪些？</h5><p>@Component，@Controller，@Service，@Repository，等等具体作用就不介绍了，用过spring的兄弟都懂。</p>
-<h3 id="二、-SpringBootApplication包含的三个重要注解"><a href="#二、-SpringBootApplication包含的三个重要注解" class="headerlink" title="二、@SpringBootApplication包含的三个重要注解"></a>二、@SpringBootApplication包含的三个重要注解</h3><h4 id="1-SpringBootConfiguration"><a href="#1-SpringBootConfiguration" class="headerlink" title="1. @SpringBootConfiguration"></a>1. @SpringBootConfiguration</h4><p>表明该类为配置类，底层还是spring的@configuration注解，标识一个可以被组件扫描器扫描的配置类</p>
-<h4 id="2-EableAutoConfiguration"><a href="#2-EableAutoConfiguration" class="headerlink" title="2.@EableAutoConfiguration"></a>2.@EableAutoConfiguration</h4><p>简述：借助@Import注解的支持，收集和注册特定场景的bean</p>
-<p>该注解下又分为以下两个重要的注解</p>
-<h5 id="（1）-AutoConfigurationPackage"><a href="#（1）-AutoConfigurationPackage" class="headerlink" title="（1）@AutoConfigurationPackage"></a>（1）@AutoConfigurationPackage</h5><p>@AutoConfigurationPackage注解的主要作用就是将<strong>主程序类所在包及所有子包下</strong>的组件到扫描到spring容器中。</p>
-<h5 id="（2）-Import-AutoConfigurationImportSelector-class"><a href="#（2）-Import-AutoConfigurationImportSelector-class" class="headerlink" title="（2）@Import(AutoConfigurationImportSelector.class)"></a>（2）@Import(AutoConfigurationImportSelector.class)</h5><p>@Import是Spring提供的注解，目的就是将所有符合自动配置条件的bean定义加载到IoC容器</p>
-<p>AutoConfigurationImportSelector类作用 是通过selectImports方法执行的过程中，会使用内部工具类<strong>SpringFactoriesLoader</strong>，查找 <strong>classpath上所有jar包中的META-INF/spring.factories</strong>进行加载，实现将配置类信息交给 <strong>SpringFactory加载器</strong>进行一系列的容器创建过程</p>
-<h4 id="3-ComponentScan"><a href="#3-ComponentScan" class="headerlink" title="3.@ComponentScan"></a>3.@ComponentScan</h4><p>这个注解是spring提供的，@ComponentScan的功能其实就是<strong>自动扫描并加载符合条件的组件</strong>（比如@Component和@Repository等）或者bean定义，最终将这些bean定义加载到IoC容器中。我们可以通过basePackages等属性来细粒度的定制@ComponentScan自动扫描的范围，<strong>如果不指定</strong>，则<strong>默认</strong>Spring框架实现会<strong>从声明@ComponentScan所在类的package</strong>进行扫描。</p>
-<p><em>注：所以SpringBoot的启动类最好是放在root package下，因为默认不指定basePackages。</em></p>
-<h3 id="三、底层实现自动配置的步骤"><a href="#三、底层实现自动配置的步骤" class="headerlink" title="三、底层实现自动配置的步骤"></a>三、底层实现自动配置的步骤</h3><ol>
-<li><p>Springboot应用启动; </p>
-</li>
-<li><p>@SpringBootApplication起作用; </p>
-</li>
-<li><p>@EnableAutoConfiguration; </p>
-</li>
-<li><p>@AutoConfigurationPackage:这个组合注解主要是 @Import(AutoConfigurationPackages.Registrar.class)，它通过<strong>将Registrar类导入到容器中</strong>，而 <strong>Registrar类作用是</strong>扫描主配置类同级目录以及子包，并将相应的组件导入到springboot创建管理 的容器中; </p>
-</li>
-<li><p>@Import(AutoConfigurationImportSelector.class):它通过将 <strong>AutoConfigurationImportSelector</strong>类导入到容器中，AutoConfigurationImportSelector类作用 是通过<strong>selectImports</strong>方法执行的过程中，会使用内部工具类SpringFactoriesLoader，<strong>查找 classpath上所有jar包中的META-INF/spring.factories进行加载</strong>，实现将配置类信息交给 SpringFactory加载器进行一系列的容器创建过程 </p>
-</li>
-</ol>
-<h3 id="四、整体启动流程"><a href="#四、整体启动流程" class="headerlink" title="四、整体启动流程"></a>四、整体启动流程</h3><h4 id="1-获取并启动监听器"><a href="#1-获取并启动监听器" class="headerlink" title="1.获取并启动监听器"></a>1.获取并启动监听器</h4><p>this.getRunListeners(args)和listeners.starting()方法主要用于获取SpringApplication实例初始化过程中初始化的SpringApplicationRunListener监听器并运行。</p>
-<h4 id="2-根据SpringApplicationRunListeners以及参数来准备环境"><a href="#2-根据SpringApplicationRunListeners以及参数来准备环境" class="headerlink" title="2.根据SpringApplicationRunListeners以及参数来准备环境"></a>2.根据SpringApplicationRunListeners以及参数来准备环境</h4><p>this.prepareEnvironment(listeners, applicationArguments)方法主要用于对项目运行环境进 行预设置，同时通过this.configureIgnoreBeanInfo(environment)方法排除一些不需要的运行环境</p>
-<h4 id="3-创建Spring容器"><a href="#3-创建Spring容器" class="headerlink" title="3.创建Spring容器"></a>3.创建Spring容器</h4><p>根据webApplicationType进行判断， 确定容器类型，如果该类型为SERVLET类型，会通过反射装载 对应的字节码，也就是AnnotationConfigServletWebServerApplicationContext，接着使用之前 初始化设置的context(应用上下文环境)、environment(项目运行环境)、listeners(运行监听 器)、applicationArguments(项目参数)和printedBanner(项目图标信息)进行应用上下文的组 装配置，并刷新配置</p>
-<h4 id="4-Spring容器前置处理"><a href="#4-Spring容器前置处理" class="headerlink" title="4.Spring容器前置处理"></a>4.Spring容器前置处理</h4><p>这一步主要是在容器刷新之前的准备动作。设置容器环境，包括各种变量等等，其中包含一个非常关键的操作:<strong>将启动类注入容器</strong>，为后续开启自动化配置奠定基础</p>
-<h4 id="5-刷新容器"><a href="#5-刷新容器" class="headerlink" title="5.刷新容器"></a>5.刷新容器</h4><p>开启刷新spring容器，通过<strong>refresh</strong>方法对整个IOC容器的初始化(包括bean资源的定位，解析，注册等 等)，同时向JVM运行时注册一个关机钩子，在JVM关机时会关闭这个上下文，除非当时它已经关闭</p>
-<h4 id="6-Spring容器后置处理"><a href="#6-Spring容器后置处理" class="headerlink" title="6.Spring容器后置处理"></a>6.Spring容器后置处理</h4><p>扩展接口，设计模式中的模板方法，默认为空实现。如果有自定义需求，可以重写该方法。比如打印一些启 动结束log，或者一些其它后置处理。</p>
-<h4 id="7-发出结束执行的事件"><a href="#7-发出结束执行的事件" class="headerlink" title="7.发出结束执行的事件"></a>7.发出结束执行的事件</h4><p>获取EventPublishingRunListener监听器，并执行其started方法，并且将创建的Spring容器传进去 了，创建一个ApplicationStartedEvent事件，并执行ConfigurableApplicationContext 的 publishEvent方法，也就是说这里是在Spring容器中发布事件，并不是在SpringApplication中发布 事件，和前面的starting是不同的，前面的starting是直接向SpringApplication中的监听器发布启 动事件。</p>
-<h4 id="8-执行Runners"><a href="#8-执行Runners" class="headerlink" title="8.执行Runners"></a>8.执行Runners</h4><p>用于调用项目中自定义的执行器<strong>XxxRunner</strong>类，使得在项目启动完成后立即执行一些特定程序。其中， Spring Boot提供的执行器接口有<strong>ApplicationRunner</strong> 和<strong>CommandLineRunner</strong>两种，在使用时只需要<strong>自定义一个执行器类实现其中一个接口并重写对应的run()方法接口</strong>，然后Spring Boot项目<strong>启动后会立即执行</strong>这些特定程序</p>
-
-
-<div class="article-footer reveal fs14"><section id="license"><div class="header"><span>许可协议</span></div><div class="body"><p>本文采用 <a target="_blank" rel="noopener" href="https://creativecommons.org/licenses/by-nc-sa/4.0/">署名-非商业性使用-相同方式共享 4.0 国际</a> 许可协议，转载请注明出处。</p>
-</div></section></div>
-
-</article>
-
-<div class="related-wrap reveal" id="read-next"><section class="header cap theme"><span>接下来阅读</span></section><section class="body fs14"><a id="next" href="/2021/10/31/%E4%BB%80%E4%B9%88%E6%98%AF%E9%80%92%E5%BD%92%E7%AE%97%E6%B3%95%EF%BC%9F/">什么是递归算法？<span class="note">较早</span></a><div class="line"></div><a id="prev" href="/2021/12/06/docker%E5%AE%89%E8%A3%85minio%EF%BC%8C%E5%92%8C%E5%85%B6%E5%9F%BA%E6%9C%AC%E4%BD%BF%E7%94%A8/">docker安装minio，和其基本使用<span class="note">较新</span></a><div class="line"></div><a id="more" href="/archives">检索全部文章</a></section></div>
-
-
-
-
-
-
-  <div class='related-wrap md reveal' id="comments">
-    <div class='cmt-title cap theme'>
-      快来参与讨论吧
-    </div>
-    <div class='cmt-body beaudar'>
-      
-
-<svg class="loading" style="vertical-align: middle;fill: currentColor;overflow: hidden;" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="2709"><path d="M832 512c0-176-144-320-320-320V128c211.2 0 384 172.8 384 384h-64zM192 512c0 176 144 320 320 320v64C300.8 896 128 723.2 128 512h64z" p-id="2710"></path></svg>
-
-<div id="beaudar" repo="654968949/blog-comments" issue-term="pathname" theme="preferred-color-scheme" input-position="top" comment-order="desc" loading="false" branch="main"></div>
-
-    </div>
-  </div>
-
-
-
-      
-<footer class="page-footer reveal fs12"><hr><div class="text"><p>本博客所有文章除特别声明外，均采用 <a target="_blank" rel="noopener" href="https://creativecommons.org/licenses/by-nc-sa/4.0/">CC BY-NC-SA 4.0</a> 许可协议，转载请注明出处。</p>
-<p>本站由 <a href="https://github.com/">@WoodsWu</a> 创建，使用 <a href="https://github.com/xaoxuu/hexo-theme-stellar/tree/1.5.2" title="v1.5.2">Stellar</a> 作为主题。</p>
-</div></footer>
-
-      <div class='float-panel mobile-only blur' style='display:none'>
-  <button type='button' class='sidebar-toggle mobile' onclick='sidebar.toggle()'>
-    <svg class="icon" style="width: 1em; height: 1em;vertical-align: middle;fill: currentColor;overflow: hidden;" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="15301"><path d="M566.407 808.3c26.9-0.1 49.3-20.8 51.6-47.6-1.9-27.7-23.9-49.7-51.6-51.6h-412.6c-28.2-1.4-52.6 19.5-55.5 47.6 2.3 26.8 24.6 47.5 51.6 47.6h416.5v4z m309.3-249.9c26.9-0.1 49.3-20.8 51.6-47.6-2.2-26.8-24.6-47.5-51.6-47.6h-721.9c-27.7-2.8-52.5 17.4-55.3 45.1-0.1 0.8-0.1 1.7-0.2 2.5 0.9 27.2 23.6 48.5 50.7 47.6H875.707z m-103.1-245.9c26.9-0.1 49.3-20.8 51.6-47.6-0.4-28.3-23.2-51.1-51.5-51.6h-618.9c-29.5-1.1-54.3 21.9-55.5 51.4v0.2c1.4 27.8 25.2 49.2 53 47.8 0.8 0 1.7-0.1 2.5-0.2h618.8z" p-id="15302"></path><path d="M566.407 808.3c26.9-0.1 49.3-20.8 51.6-47.6-1.9-27.7-23.9-49.7-51.6-51.6h-412.6c-28.2-1.4-52.6 19.5-55.5 47.6 1.9 27.7 23.9 49.7 51.6 51.6h416.5z m309.3-249.9c26.9-0.1 49.3-20.8 51.6-47.6-2.2-26.8-24.6-47.5-51.6-47.6h-721.9c-27.7-2.8-52.5 17.4-55.3 45.1-0.1 0.8-0.1 1.7-0.2 2.5 0.9 27.2 23.6 48.5 50.7 47.6H875.707z m-103.1-245.9c26.9-0.1 49.3-20.8 51.6-47.6-0.4-28.3-23.2-51.1-51.5-51.6h-618.9c-29.5-1.1-54.3 21.9-55.5 51.4v0.2c1.4 27.8 25.2 49.2 53 47.8 0.8 0 1.7-0.1 2.5-0.2h618.8z" p-id="15303"></path></svg>
-  </button>
-</div>
-
-    </div>
-  </div>
-  <div class='scripts'>
-    <script type="text/javascript">
-  stellar = {
-    // 懒加载 css https://github.com/filamentgroup/loadCSS
-    loadCSS: (href, before, media, attributes) => {
-      var doc = window.document;
-      var ss = doc.createElement("link");
-      var ref;
-      if (before) {
-        ref = before;
-      } else {
-        var refs = (doc.body || doc.getElementsByTagName("head")[0]).childNodes;
-        ref = refs[refs.length - 1];
-      }
-      var sheets = doc.styleSheets;
-      if (attributes) {
-        for (var attributeName in attributes) {
-          if (attributes.hasOwnProperty(attributeName)) {
-            ss.setAttribute(attributeName, attributes[attributeName]);
-          }
-        }
-      }
-      ss.rel = "stylesheet";
-      ss.href = href;
-      ss.media = "only x";
-      function ready(cb) {
-        if (doc.body) {
-          return cb();
-        }
-        setTimeout(function () {
-          ready(cb);
-        });
-      }
-      ready(function () {
-        ref.parentNode.insertBefore(ss, before ? ref : ref.nextSibling);
-      });
-      var onloadcssdefined = function (cb) {
-        var resolvedHref = ss.href;
-        var i = sheets.length;
-        while (i--) {
-          if (sheets[i].href === resolvedHref) {
-            return cb();
-          }
-        }
-        setTimeout(function () {
-          onloadcssdefined(cb);
-        });
-      };
-      function loadCB() {
-        if (ss.addEventListener) {
-          ss.removeEventListener("load", loadCB);
-        }
-        ss.media = media || "all";
-      }
-      if (ss.addEventListener) {
-        ss.addEventListener("load", loadCB);
-      }
-      ss.onloadcssdefined = onloadcssdefined;
-      onloadcssdefined(loadCB);
-      return ss;
-    },
-
-    // 从 butterfly 和 volantis 获得灵感
-    loadScript: (src, opt) => new Promise((resolve, reject) => {
-      var script = document.createElement('script');
-      script.src = src;
-      if (opt) {
-        for (let key of Object.keys(opt)) {
-          script[key] = opt[key]
-        }
-      } else {
-        // 默认异步，如果需要同步，第二个参数传入 {} 即可
-        script.async = true
-      }
-      script.onerror = reject
-      script.onload = script.onreadystatechange = function() {
-        const loadState = this.readyState
-        if (loadState && loadState !== 'loaded' && loadState !== 'complete') return
-        script.onload = script.onreadystatechange = null
-        resolve()
-      }
-      document.head.appendChild(script)
-    }),
-
-    // https://github.com/jerryc127/hexo-theme-butterfly
-    jQuery: (fn) => {
-      if (typeof jQuery === 'undefined') {
-        stellar.loadScript(stellar.plugins.jQuery).then(fn)
-      } else {
-        fn()
-      }
-    }
-  };
-  stellar.github = 'https://github.com/xaoxuu/hexo-theme-stellar/tree/1.5.2';
-  stellar.config = {
-    date_suffix: {
-      just: '刚刚',
-      min: '分钟前',
-      hour: '小时前',
-      day: '天前',
-      month: '个月前',
-    },
-  };
-
-  // required plugins (only load if needs)
-  stellar.plugins = {
-    jQuery: 'https://cdn.jsdelivr.net/npm/jquery@3.5.1/dist/jquery.min.js',
-    sitesjs: '/js/plugins/sites.js',
-    friendsjs: '/js/plugins/friends.js',
-  };
-
-  // optional plugins
-  if ('true' == 'true') {
-    stellar.plugins.lazyload = Object.assign({"enable":true,"js":"https://cdn.jsdelivr.net/npm/vanilla-lazyload@17.3.1/dist/lazyload.min.js","transition":"blur"});
+.l_body {
+  display: flex;
+  margin: auto;
+  padding: 0 var(--gap-l);
+  justify-content: center;
+}
+.l_body .l_left {
+  z-index: 8;
+  width: var(--width-left);
+  flex-shrink: 0;
+  position: sticky;
+  position: -webkit-sticky;
+  top: 0;
+}
+.l_body .l_main {
+  flex-shrink: 1;
+  flex-grow: 1;
+  width: 320px;
+  max-width: var(--width-main);
+}
+@media screen and (max-width: $device-tablet) {
+  .mobile-only {
+    display: block !important;
   }
-  if ('true' == 'true') {
-    stellar.plugins.swiper = Object.assign({"enable":true,"css":"https://unpkg.com/swiper@6/swiper-bundle.min.css","js":"https://unpkg.com/swiper@6/swiper-bundle.min.js"});
+  .l_body {
+    padding: 0;
   }
-  if ('' == 'true') {
-    stellar.plugins.scrollreveal = Object.assign({"enable":null,"js":"https://cdn.jsdelivr.net/npm/scrollreveal@4.0.9/dist/scrollreveal.min.js","distance":"8px","duration":500,"interval":100,"scale":1});
+  .l_body .l_left {
+    position: fixed;
+    transform: translateX(-320px);
+    margin: 0;
+    left: 0;
+    background: var(--site-bg);
+    box-shadow: $boxshadow-card-float;
+    z-index: 10;
   }
-  if ('true' == 'true') {
-    stellar.plugins.preload = Object.assign({"enable":true,"service":"flying_pages","instant_page":"https://cdn.jsdelivr.net/gh/volantis-x/cdn-volantis@4.1.2/js/instant_page.js","flying_pages":"https://cdn.jsdelivr.net/gh/gijo-varghese/flying-pages@2.1.2/flying-pages.min.js"});
+  .l_body .l_main {
+    max-width: 100%;
   }
-</script>
-
-<!-- required -->
-
-  
-<script src="/js/main.js" async></script>
-
-
-
-<!-- optional -->
-
-  <script>
-  function loadBeaudar() {
-    const els = document.querySelectorAll("#comments #beaudar");
-    if (els.length === 0) return;
-    els.forEach((el, i) => {
-      try {
-        el.innerHTML = '';
-      } catch (error) {
-        console.log(error);
-      }
-      var script = document.createElement('script');
-      script.src = 'https://beaudar.lipk.org/client.js';
-      script.async = true;
-      for (let key of Object.keys(el.attributes)) {
-        let attr = el.attributes[key];
-        if (['class', 'id'].includes(attr.name) === false) {
-          script.setAttribute(attr.name, attr.value);
-        }
-      }
-      el.appendChild(script);
-    });
+  .l_body.mobile .l_left {
+    transition: transform 0.3s ease-out;
   }
-  window.addEventListener('DOMContentLoaded', (event) => {
-      loadBeaudar();
-  });
-</script>
-
-
-
-
-<!-- inject -->
-
-
-  </div>
-</body>
-</html>
+  .l_body.mobile.sidebar .l_left {
+    transform: translateX(0px);
+  }
+}
