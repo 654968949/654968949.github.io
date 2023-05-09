@@ -64,19 +64,7 @@
   </div>
   <div class='widget-body fs14'>
     
-      <h3 id="离思五首·其四"><a href="#离思五首·其四" class="headerlink" title="离思五首·其四"></a>离思五首·其四</h3>
-    
-      <p><strong>曾经沧海难为水，</strong></p>
-
-    
-      <p><strong>除却巫山不是云。</strong></p>
-
-    
-      <p><strong>取次花丛懒回顾，</strong></p>
-
-    
-      <p><strong>半缘修道半缘君。</strong></p>
-
+      <h3 id="GO-——-gt-gt-gt"><a href="#GO-——-gt-gt-gt" class="headerlink" title="GO ——&gt;&gt;&gt;"></a>GO ——&gt;&gt;&gt;</h3>
     
   </div>
 </div>
@@ -121,7 +109,12 @@
   </nav>
 </div>
 
-  <div class="post-list post"><a class="post-card post " href="/2022/09/02/CompletableFuture%E7%9A%84%E4%BD%BF%E7%94%A8/"><article class="md">
+  <div class="post-list post"><a class="post-card post " href="/2023/04/20/OpenFeign(9.5.0)%E6%80%A7%E8%83%BD%E4%BC%98%E5%8C%96%E5%B0%9D%E8%AF%95%20/"><article class="md">
+<h2 class="post-title">OpenFeign(9.5.0)性能优化尝试</h2><div class="excerpt"><p>一、为什么需要优化？​        微服务之间的RPC调用使用的OpenFeign组件，并且完全使用的默认设置，默认的设置包括：
+1.1 HTTP客户端默认使用的HttpURLConnection，这是java自带的发送http请求的API，优点就是java自带的，调用的时候方便，缺点就是性能和安全方面
+缺点
+HttpURLConnection每次请求都会打开一个新的TCP连接，不复用TC...</p></div><div class="meta cap"><span class="cap" id="post-meta">发布于&nbsp;<time datetime="2023-04-20T10:29:35.664Z">2023-04-20</time></span><span class="cap breadcrumb">SpringCloud</span><div>
+</article></a><a class="post-card post " href="/2022/09/02/CompletableFuture%E7%9A%84%E4%BD%BF%E7%94%A8/"><article class="md">
 <h2 class="post-title">CompletableFuture的使用</h2><div class="excerpt"><p>什么作用？引入CompletableFuture，对业务流程进行编排，降低依赖之间的阻塞。充分利用我们的CPU资源，不让我们的CPU资源大量浪费在阻塞等待上。
 几种使用场景根据CompletableFuture依赖数量，可以分为以下几类：零依赖、一元依赖、二元依赖和多元依赖。
 以下的CompletableFuture都以CF简称。
@@ -163,9 +156,6 @@ IoC思想下开发方式:我们不用自己去new对象了，而是由IoC容器(
 它的工作流程如图：
 Filter的这个特性在生产环境中有很广泛的应用，如：修改请求和响应、防止xss攻击、包装二进制流使其可以多次读，等等。
 实际工作...</p></div><div class="meta cap"><span class="cap" id="post-meta">发布于&nbsp;<time datetime="2022-03-16T01:40:49.947Z">2022-03-16</time></span><span class="cap breadcrumb">Spring</span><div>
-</article></a><a class="post-card post " href="/2021/12/06/%E6%B3%A8%E5%86%8C%E4%B8%AD%E5%BF%83%E9%80%89%E5%9E%8B%E5%88%86%E6%9E%90(%E6%9C%AA%E5%AE%8C%E6%88%90)/"><article class="md">
-<h2 class="post-title">注册中心选型分析</h2><div class="excerpt"><p>一. 认识注册中心注册中心的出现本来在后端的领域中是没有注册中心这个概念的，因为原来的单体应用架构，代码之间的各种调用都是在同一台服务器，所以不需要。
-但是随着服务上云，分布式应用的兴起，就诞生了现在的微服务的架构模式，不同的业务服务放在不同的云服务器上面，所以就会有个非常显著的问题，不同的服务器之间的业务接口怎么相互调用，最简单的，直接用http实现相互的调用，这样子的确可以解决一定的问题...</p></div><div class="meta cap"><span class="cap" id="post-meta">发布于&nbsp;<time datetime="2021-12-06T08:56:08.629Z">2021-12-06</time></span><span class="cap breadcrumb">注册中心</span><div>
 </article></a></div>
   
   <div class='paginator-wrap dis-select'>
