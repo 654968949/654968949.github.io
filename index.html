@@ -109,7 +109,13 @@
   </nav>
 </div>
 
-  <div class="post-list post"><a class="post-card post " href="/2023/08/18/easyPoi%E8%87%AA%E5%AE%9A%E4%B9%89%E4%BB%A3%E7%A0%81%E5%AF%BC%E5%87%BA%E6%8A%A5%E8%A1%A8/"><article class="md">
+  <div class="post-list post"><a class="post-card post " href="/2023/09/28/clickhouse%E5%9F%BA%E7%A1%80%E5%AD%A6%E4%B9%A0/"><article class="md">
+<h2 class="post-title">clickhouse基础学习</h2><div class="excerpt"><p>一、是什么ClickHouse是一个开源的列式数据库管理系统，专门设计用于处理大规模数据分析和OLAP（在线分析处理）工作负载。它最初由俄罗斯的Yandex公司开发，并于2016年发布为开源项目。
+二、有什么特点
+列式存储：ClickHouse以列式存储方式组织数据，这意味着相同列中的数据存储在一起，这种存储方式在分析查询和聚合操作中非常高效。
+
+高性能：ClickHouse被设计成能够处理...</p></div><div class="meta cap"><span class="cap" id="post-meta">发布于&nbsp;<time datetime="2023-09-28T07:45:15.964Z">2023-09-28</time></span><span class="cap breadcrumb">clickhouse</span><div>
+</article></a><a class="post-card post " href="/2023/08/18/easyPoi%E8%87%AA%E5%AE%9A%E4%B9%89%E4%BB%A3%E7%A0%81%E5%AF%BC%E5%87%BA%E6%8A%A5%E8%A1%A8/"><article class="md">
 <h2 class="post-title">easyPoi自定义代码导出报表</h2><div class="excerpt"><p>一、问题
 这种，表头是两行构成一行是一个单元格，一行是两个单元格，并且单元格是不确定的，会动态增加的，有得力，有京东，小米，华为…….。想要图快，使用easyPoi的模版导出，好像是不太现实，只好用写代码的方式来操作。但是也不是完全凭自己的方式来。用easyPoi带的一些方法来操作。
 二、写代码1234567891011121314151617181920212223242526272829...</p></div><div class="meta cap"><span class="cap" id="post-meta">发布于&nbsp;<time datetime="2023-08-18T07:06:55.002Z">2023-08-18</time></span><span class="cap breadcrumb">报表开发</span><div>
@@ -129,12 +135,6 @@ HttpURLConnection每次请求都会打开一个新的TCP连接，不复用TC...<
 如: Person p = new Pers...</p></div><div class="meta cap"><span class="cap" id="post-meta">发布于&nbsp;<time datetime="2022-06-21T02:31:59.523Z">2022-06-21</time></span><span class="cap breadcrumb">Java基础知识</span><div>
 </article></a><a class="post-card post " href="/2022/06/21/SpringBoot%E7%9A%84%E5%9B%9B%E7%A7%8D%E9%89%B4%E6%9D%83%E6%96%B9%E5%BC%8F/"><article class="md">
 <h2 class="post-title">SpringBoot的四种鉴权方式</h2><div class="excerpt"><p>一、传统AOP切面类12345678910111213@Aspect  public class WhitelistAspect &#123;        @Before(value = &quot;whitelistPointcut() &amp;&amp; @annotation(whitelist)&quot;)   public void checkAppkeyWhitelist(...</p></div><div class="meta cap"><span class="cap" id="post-meta">发布于&nbsp;<time datetime="2022-06-21T02:31:59.523Z">2022-06-21</time></span><span class="cap breadcrumb">SpringBoot</span><div>
-</article></a><a class="post-card post " href="/2022/06/21/clickhouse%E5%9F%BA%E7%A1%80%E5%AD%A6%E4%B9%A0/"><article class="md">
-<h2 class="post-title">clickhouse基础学习</h2><div class="excerpt"><p>一、是什么ClickHouse是一个开源的列式数据库管理系统，专门设计用于处理大规模数据分析和OLAP（在线分析处理）工作负载。它最初由俄罗斯的Yandex公司开发，并于2016年发布为开源项目。
-二、有什么特点
-列式存储：ClickHouse以列式存储方式组织数据，这意味着相同列中的数据存储在一起，这种存储方式在分析查询和聚合操作中非常高效。
-
-高性能：ClickHouse被设计成能够处理...</p></div><div class="meta cap"><span class="cap" id="post-meta">发布于&nbsp;<time datetime="2022-06-21T02:31:59.523Z">2022-06-21</time></span><span class="cap breadcrumb">clickhouse</span><div>
 </article></a><a class="post-card post " href="/2022/06/21/docker%E6%90%AD%E5%BB%BAcanal-server%E5%92%8Ccanal-admin/"><article class="md">
 <h2 class="post-title">docker搭建canal-server和canal-admin</h2><div class="excerpt"><p>一、搭建有binlog功能的mysql1.1 先建两文件夹我是使用docker来搭建，在服务器上建这么两个目录，用来挂载docker里面的mysql的配置文件，和mysql的数据存储, 后面docker run要用
 12/etc/mysql   ##挂载mysql的配置文件/opt/mysql   ##挂载mysql的数据存储
