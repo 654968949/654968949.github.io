@@ -109,7 +109,10 @@
   </nav>
 </div>
 
-  <div class="post-list post"><a class="post-card post " href="/2022/06/21/%E7%BA%BF%E7%A8%8B%E6%B1%A0%E7%9A%84%E5%9B%9B%E7%A7%8D%E9%98%BB%E5%A1%9E%E9%98%9F%E5%88%97%E6%B5%85%E8%A7%A3/"><article class="md">
+  <div class="post-list post"><a class="post-card post " href="/2022/06/21/%E6%B3%A8%E8%A7%A3Configuration%E5%92%8C%E6%B3%A8%E8%A7%A3Component%E7%94%A8%E6%B3%95%E5%92%8C%E5%BC%82%E5%90%8C/"><article class="md">
+<h2 class="post-title">Configuration和Component用法和异同</h2><div class="excerpt"><p>一、各自在代码中的定义先看一下Spring中的类定义
+123456789@Target(ElementType.TYPE)@Retention(RetentionPolicy.RUNTIME)@Documented@Componentpublic @interface Configuration &#123;   @AliasFor(annotation = Component.class)...</p></div><div class="meta cap"><span class="cap" id="post-meta">发布于&nbsp;<time datetime="2022-06-21T02:31:59.523Z">2022-06-21</time></span><span class="cap breadcrumb">Spring</span><div>
+</article></a><a class="post-card post " href="/2022/06/21/%E7%BA%BF%E7%A8%8B%E6%B1%A0%E7%9A%84%E5%9B%9B%E7%A7%8D%E9%98%BB%E5%A1%9E%E9%98%9F%E5%88%97%E6%B5%85%E8%A7%A3/"><article class="md">
 <h2 class="post-title">线程池的四种阻塞队列浅解</h2><div class="excerpt"><p>一. ArrayBlockingQueue内部使用数组存储元素，利用reentrantlock实现线程安全，在创建的时候必须指定容量，之后也不可以再扩容了，在构造函数中可以指定是否公平，第一个参数是容量，第二个参数是是否公平。正如ReentrantLock一样，如果ArrayBlockingQueue被设置为非公平的，那么就存在插队的可能；如果设置为公平的，那么等待了最长时间的线程会被优先处...</p></div><div class="meta cap"><span class="cap" id="post-meta">发布于&nbsp;<time datetime="2022-06-21T02:31:59.523Z">2022-06-21</time></span><span class="cap breadcrumb">异步编程</span><div>
 </article></a><a class="post-card post " href="/2022/06/09/Spring%E7%AC%94%E8%AE%B0/"><article class="md">
 <h2 class="post-title">SpringBoot笔记</h2><div class="excerpt"><p>一、核心思想1.IocIoC Inversion of Control (控制反转/反转控制)，注意它是一个技术思想，不是一个技术实现

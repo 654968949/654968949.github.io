@@ -109,7 +109,12 @@
   </nav>
 </div>
 
-  <div class="post-list post"><a class="post-card post " href="/2025/08/15/python%E5%90%88%E5%B9%B6%E7%9B%B8%E5%90%8C%E6%A0%BC%E5%BC%8F%E7%9A%84excel%EF%BC%88%E5%B8%A6%E5%90%88%E5%B9%B6%E8%BF%9B%E5%BA%A6%E6%9D%A1%EF%BC%89/"><article class="md">
+  <div class="post-list post"><a class="post-card post " href="/2025/08/25/MYSQL%E6%89%A7%E8%A1%8Calter%E8%AF%AD%E5%8F%A5%E9%94%81%E8%A1%A8%E4%BA%86%E6%80%8E%E4%B9%88%E5%8A%9E%EF%BC%9F/"><article class="md">
+<h2 class="post-title">mysql执行alter语句锁表了怎么办？</h2><div class="excerpt"><p>一、执行的ALTER语句12ALTER TABLE order_info    ADD COLUMN `flag` int(11) default 0 not null comment &#x27;0-不急 1--急&#x27;;
+
+假设这个表数量比较大，有一千万数据，同时你又有业务场景对它增删改查，肯定会锁表的。锁表了你们业务就会异常，肯定就会监控报警
+二、解决锁表问题1SELECT * ...</p></div><div class="meta cap"><span class="cap" id="post-meta">发布于&nbsp;<time datetime="2025-08-25T06:37:49.906Z">2025-08-25</time></span><span class="cap breadcrumb">MYSQL</span><div>
+</article></a><a class="post-card post " href="/2025/08/15/python%E5%90%88%E5%B9%B6%E7%9B%B8%E5%90%8C%E6%A0%BC%E5%BC%8F%E7%9A%84excel%EF%BC%88%E5%B8%A6%E5%90%88%E5%B9%B6%E8%BF%9B%E5%BA%A6%E6%9D%A1%EF%BC%89/"><article class="md">
 <h2 class="post-title">python合并相同格式的excel（带合并进度条）</h2><div class="excerpt"><p>1234567891011121314151617181920212223242526272829303132333435363738import os as osimport pandas as pdfrom tqdm import tqdmdef run():    folder_path = &#x27;/Users/woods/Downloads/订单明细报表20231221-202...</p></div><div class="meta cap"><span class="cap" id="post-meta">发布于&nbsp;<time datetime="2025-08-15T05:16:53.283Z">2025-08-15</time></span><span class="cap breadcrumb">Python工具</span><div>
 </article></a><a class="post-card post " href="/2023/09/28/clickhouse%E5%9F%BA%E7%A1%80%E5%AD%A6%E4%B9%A0/"><article class="md">
 <h2 class="post-title">clickhouse基础学习</h2><div class="excerpt"><p>一、是什么ClickHouse是一个开源的列式数据库管理系统，专门设计用于处理大规模数据分析和OLAP（在线分析处理）工作负载。它最初由俄罗斯的Yandex公司开发，并于2016年发布为开源项目。
@@ -153,9 +158,6 @@ HttpURLConnection每次请求都会打开一个新的TCP连接，不复用TC...<
 趋势递增：最好趋势递增，这个要求就得看具体业务场景了，一般不严格要求
 
 一、UUID优点本地生成，没有网络的消耗...</p></div><div class="meta cap"><span class="cap" id="post-meta">发布于&nbsp;<time datetime="2022-06-21T02:31:59.523Z">2022-06-21</time></span><span class="cap breadcrumb">分布式id</span><div>
-</article></a><a class="post-card post " href="/2022/06/21/%E6%B3%A8%E8%A7%A3Configuration%E5%92%8C%E6%B3%A8%E8%A7%A3Component%E7%94%A8%E6%B3%95%E5%92%8C%E5%BC%82%E5%90%8C/"><article class="md">
-<h2 class="post-title">Configuration和Component用法和异同</h2><div class="excerpt"><p>一、各自在代码中的定义先看一下Spring中的类定义
-123456789@Target(ElementType.TYPE)@Retention(RetentionPolicy.RUNTIME)@Documented@Componentpublic @interface Configuration &#123;   @AliasFor(annotation = Component.class)...</p></div><div class="meta cap"><span class="cap" id="post-meta">发布于&nbsp;<time datetime="2022-06-21T02:31:59.523Z">2022-06-21</time></span><span class="cap breadcrumb">Spring</span><div>
 </article></a></div>
   
   <div class='paginator-wrap dis-select'>
