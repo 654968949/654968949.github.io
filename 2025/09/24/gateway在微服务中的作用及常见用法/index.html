@@ -1,0 +1,328 @@
+<!DOCTYPE html>
+<html lang='zh-CN'>
+
+<head>
+  <meta name="generator" content="Hexo 5.4.0">
+  <meta charset="utf-8">
+  
+
+  <meta http-equiv='x-dns-prefetch-control' content='on' />
+  <link rel='dns-prefetch' href='https://cdn.jsdelivr.net'>
+  <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
+
+  <meta name="renderer" content="webkit">
+  <meta name="force-rendering" content="webkit">
+  <meta http-equiv="X-UA-Compatible" content="IE=Edge,chrome=1">
+  <meta name="HandheldFriendly" content="True" >
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <meta name="theme-color" content="#f8f8f8">
+  <title>gateway在微服务中的作用及常见用法 - Woods's Blog</title>
+
+  
+    <meta name="description" content="一、网关在微服务中的作用 路由转发，将外部请求经由gateway路由转发至相应的微服务  熔断限流，入口都在gateway，自然可以对请求进行熔断限流处理  认证授权，同上理  处理请求的通用逻辑   Spring-Cloud体系常用的网关有gateway，zuul（已停止维护） 二、gateway在Spring-Cloud里面具体怎么使用？2.1 服务路由通常这个路由是写在YAML&#x2F;Proper">
+<meta property="og:type" content="article">
+<meta property="og:title" content="gateway在微服务中的作用及常见用法">
+<meta property="og:url" content="https://github.com/2025/09/24/gateway%E5%9C%A8%E5%BE%AE%E6%9C%8D%E5%8A%A1%E4%B8%AD%E7%9A%84%E4%BD%9C%E7%94%A8%E5%8F%8A%E5%B8%B8%E8%A7%81%E7%94%A8%E6%B3%95/index.html">
+<meta property="og:site_name" content="Woods&#39;s Blog">
+<meta property="og:description" content="一、网关在微服务中的作用 路由转发，将外部请求经由gateway路由转发至相应的微服务  熔断限流，入口都在gateway，自然可以对请求进行熔断限流处理  认证授权，同上理  处理请求的通用逻辑   Spring-Cloud体系常用的网关有gateway，zuul（已停止维护） 二、gateway在Spring-Cloud里面具体怎么使用？2.1 服务路由通常这个路由是写在YAML&#x2F;Proper">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2025-09-24T03:31:26.145Z">
+<meta property="article:modified_time" content="2025-09-24T15:04:33.252Z">
+<meta property="article:author" content="WoodsWu">
+<meta property="article:tag" content="gateway">
+<meta name="twitter:card" content="summary">
+  
+  
+
+  <!-- feed -->
+  
+
+  
+    
+<link rel="stylesheet" href="/css/main.css">
+
+  
+
+  
+
+  
+</head>
+
+<body>
+  
+
+
+  <div class='l_body' id='start'>
+    <aside class='l_left' layout='post'>
+    
+
+
+<header class="header">
+
+<div class="logo-wrap"><a class="avatar" href="/about/"><div class="bg" style="opacity:0;background-image:url(https://cdn.jsdelivr.net/gh/cdn-x/placeholder@1.0.2/avatar/round/rainbow64@3x.webp);"></div><img no-lazy class="avatar" src="https://upload.jianshu.io/users/upload_avatars/15586926/58772875-84f9-4db7-9deb-f3d0fc2b57fe.png" onerror="javascript:this.classList.add('error');this.src='https://cdn.jsdelivr.net/gh/cdn-x/placeholder@1.0.1/image/2659360.svg';"></a><a class="title" href="/"><div class="main">Woods's Blog</div></a></div>
+<nav class="menu dis-select"><a class="nav-item active" href="/">文章</a></nav></header>
+
+<div class="widgets">
+
+<div class="widget-wrap single" id="toc"><div class="widget-header cap dis-select"><span class="name">本文目录</span></div><div class="widget-body fs14"><div class="doc-tree active"><ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%B8%80%E3%80%81%E7%BD%91%E5%85%B3%E5%9C%A8%E5%BE%AE%E6%9C%8D%E5%8A%A1%E4%B8%AD%E7%9A%84%E4%BD%9C%E7%94%A8"><span class="toc-text">一、网关在微服务中的作用</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%BA%8C%E3%80%81gateway%E5%9C%A8Spring-Cloud%E9%87%8C%E9%9D%A2%E5%85%B7%E4%BD%93%E6%80%8E%E4%B9%88%E4%BD%BF%E7%94%A8%EF%BC%9F"><span class="toc-text">二、gateway在Spring-Cloud里面具体怎么使用？</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#2-1-%E6%9C%8D%E5%8A%A1%E8%B7%AF%E7%94%B1"><span class="toc-text">2.1 服务路由</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2-2-%E5%85%A8%E5%B1%80%E9%93%BE%E5%BC%8F%E8%BF%87%E6%BB%A4%E5%99%A8GlobalFilter"><span class="toc-text">2.2 全局链式过滤器GlobalFilter</span></a></li></ol></li></ol></div></div></div>
+
+
+</div>
+
+
+    </aside>
+    <div class='l_main'>
+      
+
+      
+
+
+<div class="bread-nav fs12"><div id="breadcrumb"><a class="cap breadcrumb" href="/">Woods's Blog</a><span class="sep"></span><a class="cap breadcrumb" href="/">文章</a><span class="sep"></span><a class="cap breadcrumb-link" href="/categories/Spring-Cloud/">Spring-Cloud</a></div><div id="post-meta">发布于&nbsp;<time datetime="2025-09-24T03:31:26.145Z">2025-09-24</time></div></div>
+
+<article class='content md post'>
+<h1 class="article-title"><span>gateway在微服务中的作用及常见用法</span></h1>
+<h2 id="一、网关在微服务中的作用"><a href="#一、网关在微服务中的作用" class="headerlink" title="一、网关在微服务中的作用"></a>一、网关在微服务中的作用</h2><ol>
+<li><p>路由转发，将外部请求经由gateway路由转发至相应的微服务</p>
+</li>
+<li><p>熔断限流，入口都在gateway，自然可以对请求进行熔断限流处理</p>
+</li>
+<li><p>认证授权，同上理</p>
+</li>
+<li><p>处理请求的通用逻辑</p>
+</li>
+</ol>
+<p>Spring-Cloud体系常用的网关有gateway，zuul（已停止维护）</p>
+<h2 id="二、gateway在Spring-Cloud里面具体怎么使用？"><a href="#二、gateway在Spring-Cloud里面具体怎么使用？" class="headerlink" title="二、gateway在Spring-Cloud里面具体怎么使用？"></a>二、gateway在Spring-Cloud里面具体怎么使用？</h2><h3 id="2-1-服务路由"><a href="#2-1-服务路由" class="headerlink" title="2.1 服务路由"></a>2.1 服务路由</h3><p>通常这个路由是写在<strong>YAML/Properties 文件</strong>中的，例如：</p>
+<figure class="highlight yaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">server:</span></span><br><span class="line">  <span class="attr">port:</span> <span class="number">10010</span> <span class="comment"># 网关服务端口</span></span><br><span class="line"></span><br><span class="line"><span class="attr">spring:</span></span><br><span class="line">  <span class="attr">application:</span></span><br><span class="line">    <span class="attr">name:</span> <span class="string">api-gateway</span> <span class="comment"># 服务名</span></span><br><span class="line">  <span class="attr">cloud:</span></span><br><span class="line">    <span class="attr">nacos:</span> <span class="comment"># 配置 Nacos 注册中心地址</span></span><br><span class="line">      <span class="attr">discovery:</span></span><br><span class="line">        <span class="attr">server-addr:</span> <span class="string">localhost:8848</span></span><br><span class="line">    <span class="attr">gateway:</span></span><br><span class="line">      <span class="attr">discovery:</span></span><br><span class="line">        <span class="attr">locator:</span></span><br><span class="line">          <span class="attr">enabled:</span> <span class="literal">true</span> <span class="comment"># 开启从服务发现中心自动创建路由的功能（可选）</span></span><br><span class="line">      <span class="attr">routes:</span></span><br><span class="line">        <span class="bullet">-</span> <span class="attr">id:</span> <span class="string">user-service</span> <span class="comment"># 路由唯一标识</span></span><br><span class="line">          <span class="attr">uri:</span> <span class="string">lb://userservice</span> <span class="comment"># 目标服务地址，lb:// 表示启用负载均衡</span></span><br><span class="line">          <span class="attr">predicates:</span> <span class="comment"># 断言数组，条件必须全部满足</span></span><br><span class="line">            <span class="bullet">-</span> <span class="string">Path=/user/**</span> <span class="comment"># 路径匹配</span></span><br><span class="line">            <span class="bullet">-</span> <span class="string">After=2023-01-20T17:42:47.789-07:00[America/Denver]</span> <span class="comment"># 时间后匹配（可选）</span></span><br><span class="line">          <span class="attr">filters:</span></span><br><span class="line">            <span class="bullet">-</span> <span class="string">RewritePath=/user/(?&lt;path&gt;.*),</span> <span class="string">/$\&#123;path&#125;</span> <span class="comment"># 重写请求路径，例如将 /user/foo 变为 /foo</span></span><br><span class="line">            <span class="bullet">-</span> <span class="string">AddRequestHeader=X-Request-Gateway,</span> <span class="string">Spring-Cloud-Gateway</span> <span class="comment"># 添加请求头</span></span><br><span class="line"></span><br><span class="line">      <span class="comment"># 默认过滤器，对所有路由生效</span></span><br><span class="line">      <span class="attr">default-filters:</span></span><br><span class="line">        <span class="bullet">-</span> <span class="string">AddResponseHeader=X-Response-Default-Filter,</span> <span class="string">Default-Value</span></span><br></pre></td></tr></table></figure>
+
+<p>但是生产环境你不可能要改个什么东西，去重启gateway吧。所以通常是结合配置中心来动态刷新，以nacos为例，需要先配置<strong>bootstrap.yml</strong>文件</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">spring:</span><br><span class="line">  application:</span><br><span class="line">    name: your-gateway-service # 应用名，也是Nacos中Data ID的一部分</span><br><span class="line">  cloud:</span><br><span class="line">    nacos:</span><br><span class="line">      discovery:</span><br><span class="line">        server-addr: localhost:8848 # Nacos服务器地址</span><br><span class="line">      config:</span><br><span class="line">        server-addr: localhost:8848</span><br><span class="line">        file-extension: yaml # 配置文件的扩展名，支持yaml, properties等</span><br><span class="line">        group: DEFAULT_GROUP # 配置分组，默认为DEFAULT_GROUP</span><br><span class="line">        # namespace: your-namespace-id # 命名空间ID，非必填，用于环境隔离</span><br></pre></td></tr></table></figure>
+
+<p><strong>在 Nacos 中创建路由配置</strong></p>
+<p>登录 Nacos 控制台，在 <strong>配置管理</strong> -&gt; <strong>配置列表</strong> 中创建一个新的配置。</p>
+<ul>
+<li><strong>Data ID</strong>: 通常格式为 <code>&#123;spring.application.name&#125;.&#123;file-extension&#125;</code>，例如你的应用名是 <code>your-gateway-service</code>，文件扩展名是 <code>yaml</code>，那么 Data ID 就填 <code>your-gateway-service.yaml</code>。</li>
+<li><strong>Group</strong>: 与 <code>bootstrap.yml</code> 中配置的 <code>group</code> 一致，默认为 <code>DEFAULT_GROUP</code>。</li>
+<li><strong>配置内容</strong>: 将原本写在 <code>application.yml</code> 里的 <code>spring.cloud.gateway.routes</code> 部分移到这里。</li>
+</ul>
+<figure class="highlight yaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">spring:</span></span><br><span class="line">  <span class="attr">cloud:</span></span><br><span class="line">    <span class="attr">gateway:</span></span><br><span class="line">      <span class="attr">routes:</span></span><br><span class="line">        <span class="bullet">-</span> <span class="attr">id:</span> <span class="string">user-service-route</span></span><br><span class="line">          <span class="attr">uri:</span> <span class="string">lb://user-service</span> <span class="comment"># 使用负载均衡形式</span></span><br><span class="line">          <span class="attr">predicates:</span></span><br><span class="line">            <span class="bullet">-</span> <span class="string">Path=/user/**</span></span><br><span class="line">          <span class="attr">filters:</span></span><br><span class="line">            <span class="bullet">-</span> <span class="string">RewritePath=/user/(?&lt;segment&gt;.*),</span> <span class="string">/$\&#123;segment&#125;</span></span><br><span class="line">        <span class="bullet">-</span> <span class="attr">id:</span> <span class="string">product-service-route</span></span><br><span class="line">          <span class="attr">uri:</span> <span class="string">lb://product-service</span></span><br><span class="line">          <span class="attr">predicates:</span></span><br><span class="line">            <span class="bullet">-</span> <span class="string">Path=/product/**</span></span><br></pre></td></tr></table></figure>
+
+<p>配置发布后，网关服务启动时会自动拉取该配置并加载路由规则。当你在 Nacos 上修改此配置并发布时，网关会自动感知并更新路由，无需重启。</p>
+<h3 id="2-2-全局链式过滤器GlobalFilter"><a href="#2-2-全局链式过滤器GlobalFilter" class="headerlink" title="2.2 全局链式过滤器GlobalFilter"></a>2.2 全局链式过滤器GlobalFilter</h3><p>GlobalFilter是用于实现全局性的逻辑，如认证、日志、限流等。你需要通过实现 <code>GlobalFilter</code> 接口来自定义</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Component</span></span><br><span class="line"><span class="meta">@Order(-1)</span> <span class="comment">// 定义过滤器执行顺序，数值越小优先级越高</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">AuthGlobalFilter</span> <span class="keyword">implements</span> <span class="title">GlobalFilter</span> </span>&#123;</span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> Mono&lt;Void&gt; <span class="title">filter</span><span class="params">(ServerWebExchange exchange, GatewayFilterChain chain)</span> </span>&#123;</span><br><span class="line">        <span class="comment">// 1. 获取请求参数等</span></span><br><span class="line">        <span class="comment">// 2. 判断逻辑，例如检查token</span></span><br><span class="line">        <span class="comment">// 3. 放行 (chain.filter(exchange)) 或拦截返回未认证错误</span></span><br><span class="line">        <span class="keyword">return</span> chain.filter(exchange);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+
+
+<div class="article-footer reveal fs14"><section id="license"><div class="header"><span>许可协议</span></div><div class="body"><p>本文采用 <a target="_blank" rel="noopener" href="https://creativecommons.org/licenses/by-nc-sa/4.0/">署名-非商业性使用-相同方式共享 4.0 国际</a> 许可协议，转载请注明出处。</p>
+</div></section></div>
+
+</article>
+
+<div class="related-wrap reveal" id="read-next"><section class="header cap theme"><span>接下来阅读</span></section><section class="body fs14"><a id="next" href="/2025/08/25/MYSQL%E6%89%A7%E8%A1%8Calter%E8%AF%AD%E5%8F%A5%E9%94%81%E8%A1%A8%E4%BA%86%E6%80%8E%E4%B9%88%E5%8A%9E%EF%BC%9F/">mysql执行alter语句锁表了怎么办？<span class="note">较早</span></a><div class="line"></div><div class="line"></div><a id="more" href="/archives">检索全部文章</a></section></div>
+
+
+
+
+
+
+  <div class='related-wrap md reveal' id="comments">
+    <div class='cmt-title cap theme'>
+      快来参与讨论吧
+    </div>
+    <div class='cmt-body beaudar'>
+      
+
+<svg class="loading" style="vertical-align: middle;fill: currentColor;overflow: hidden;" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="2709"><path d="M832 512c0-176-144-320-320-320V128c211.2 0 384 172.8 384 384h-64zM192 512c0 176 144 320 320 320v64C300.8 896 128 723.2 128 512h64z" p-id="2710"></path></svg>
+
+<div id="beaudar" repo="654968949/blog-comments" issue-term="pathname" theme="preferred-color-scheme" input-position="top" comment-order="desc" loading="false" branch="main"></div>
+
+    </div>
+  </div>
+
+
+
+      
+<footer class="page-footer reveal fs12"><hr><div class="text"><p>本博客所有文章除特别声明外，均采用 <a target="_blank" rel="noopener" href="https://creativecommons.org/licenses/by-nc-sa/4.0/">CC BY-NC-SA 4.0</a> 许可协议，转载请注明出处。</p>
+<p>本站由 <a href="https://github.com/">@WoodsWu</a> 创建，使用 <a href="https://github.com/xaoxuu/hexo-theme-stellar/tree/1.5.2" title="v1.5.2">Stellar</a> 作为主题。</p>
+</div></footer>
+
+      <div class='float-panel mobile-only blur' style='display:none'>
+  <button type='button' class='sidebar-toggle mobile' onclick='sidebar.toggle()'>
+    <svg class="icon" style="width: 1em; height: 1em;vertical-align: middle;fill: currentColor;overflow: hidden;" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="15301"><path d="M566.407 808.3c26.9-0.1 49.3-20.8 51.6-47.6-1.9-27.7-23.9-49.7-51.6-51.6h-412.6c-28.2-1.4-52.6 19.5-55.5 47.6 2.3 26.8 24.6 47.5 51.6 47.6h416.5v4z m309.3-249.9c26.9-0.1 49.3-20.8 51.6-47.6-2.2-26.8-24.6-47.5-51.6-47.6h-721.9c-27.7-2.8-52.5 17.4-55.3 45.1-0.1 0.8-0.1 1.7-0.2 2.5 0.9 27.2 23.6 48.5 50.7 47.6H875.707z m-103.1-245.9c26.9-0.1 49.3-20.8 51.6-47.6-0.4-28.3-23.2-51.1-51.5-51.6h-618.9c-29.5-1.1-54.3 21.9-55.5 51.4v0.2c1.4 27.8 25.2 49.2 53 47.8 0.8 0 1.7-0.1 2.5-0.2h618.8z" p-id="15302"></path><path d="M566.407 808.3c26.9-0.1 49.3-20.8 51.6-47.6-1.9-27.7-23.9-49.7-51.6-51.6h-412.6c-28.2-1.4-52.6 19.5-55.5 47.6 1.9 27.7 23.9 49.7 51.6 51.6h416.5z m309.3-249.9c26.9-0.1 49.3-20.8 51.6-47.6-2.2-26.8-24.6-47.5-51.6-47.6h-721.9c-27.7-2.8-52.5 17.4-55.3 45.1-0.1 0.8-0.1 1.7-0.2 2.5 0.9 27.2 23.6 48.5 50.7 47.6H875.707z m-103.1-245.9c26.9-0.1 49.3-20.8 51.6-47.6-0.4-28.3-23.2-51.1-51.5-51.6h-618.9c-29.5-1.1-54.3 21.9-55.5 51.4v0.2c1.4 27.8 25.2 49.2 53 47.8 0.8 0 1.7-0.1 2.5-0.2h618.8z" p-id="15303"></path></svg>
+  </button>
+</div>
+
+    </div>
+  </div>
+  <div class='scripts'>
+    <script type="text/javascript">
+  stellar = {
+    // 懒加载 css https://github.com/filamentgroup/loadCSS
+    loadCSS: (href, before, media, attributes) => {
+      var doc = window.document;
+      var ss = doc.createElement("link");
+      var ref;
+      if (before) {
+        ref = before;
+      } else {
+        var refs = (doc.body || doc.getElementsByTagName("head")[0]).childNodes;
+        ref = refs[refs.length - 1];
+      }
+      var sheets = doc.styleSheets;
+      if (attributes) {
+        for (var attributeName in attributes) {
+          if (attributes.hasOwnProperty(attributeName)) {
+            ss.setAttribute(attributeName, attributes[attributeName]);
+          }
+        }
+      }
+      ss.rel = "stylesheet";
+      ss.href = href;
+      ss.media = "only x";
+      function ready(cb) {
+        if (doc.body) {
+          return cb();
+        }
+        setTimeout(function () {
+          ready(cb);
+        });
+      }
+      ready(function () {
+        ref.parentNode.insertBefore(ss, before ? ref : ref.nextSibling);
+      });
+      var onloadcssdefined = function (cb) {
+        var resolvedHref = ss.href;
+        var i = sheets.length;
+        while (i--) {
+          if (sheets[i].href === resolvedHref) {
+            return cb();
+          }
+        }
+        setTimeout(function () {
+          onloadcssdefined(cb);
+        });
+      };
+      function loadCB() {
+        if (ss.addEventListener) {
+          ss.removeEventListener("load", loadCB);
+        }
+        ss.media = media || "all";
+      }
+      if (ss.addEventListener) {
+        ss.addEventListener("load", loadCB);
+      }
+      ss.onloadcssdefined = onloadcssdefined;
+      onloadcssdefined(loadCB);
+      return ss;
+    },
+
+    // 从 butterfly 和 volantis 获得灵感
+    loadScript: (src, opt) => new Promise((resolve, reject) => {
+      var script = document.createElement('script');
+      script.src = src;
+      if (opt) {
+        for (let key of Object.keys(opt)) {
+          script[key] = opt[key]
+        }
+      } else {
+        // 默认异步，如果需要同步，第二个参数传入 {} 即可
+        script.async = true
+      }
+      script.onerror = reject
+      script.onload = script.onreadystatechange = function() {
+        const loadState = this.readyState
+        if (loadState && loadState !== 'loaded' && loadState !== 'complete') return
+        script.onload = script.onreadystatechange = null
+        resolve()
+      }
+      document.head.appendChild(script)
+    }),
+
+    // https://github.com/jerryc127/hexo-theme-butterfly
+    jQuery: (fn) => {
+      if (typeof jQuery === 'undefined') {
+        stellar.loadScript(stellar.plugins.jQuery).then(fn)
+      } else {
+        fn()
+      }
+    }
+  };
+  stellar.github = 'https://github.com/xaoxuu/hexo-theme-stellar/tree/1.5.2';
+  stellar.config = {
+    date_suffix: {
+      just: '刚刚',
+      min: '分钟前',
+      hour: '小时前',
+      day: '天前',
+      month: '个月前',
+    },
+  };
+
+  // required plugins (only load if needs)
+  stellar.plugins = {
+    jQuery: 'https://cdn.jsdelivr.net/npm/jquery@3.5.1/dist/jquery.min.js',
+    sitesjs: '/js/plugins/sites.js',
+    friendsjs: '/js/plugins/friends.js',
+  };
+
+  // optional plugins
+  if ('true' == 'true') {
+    stellar.plugins.lazyload = Object.assign({"enable":true,"js":"https://cdn.jsdelivr.net/npm/vanilla-lazyload@17.3.1/dist/lazyload.min.js","transition":"blur"});
+  }
+  if ('true' == 'true') {
+    stellar.plugins.swiper = Object.assign({"enable":true,"css":"https://unpkg.com/swiper@6/swiper-bundle.min.css","js":"https://unpkg.com/swiper@6/swiper-bundle.min.js"});
+  }
+  if ('' == 'true') {
+    stellar.plugins.scrollreveal = Object.assign({"enable":null,"js":"https://cdn.jsdelivr.net/npm/scrollreveal@4.0.9/dist/scrollreveal.min.js","distance":"8px","duration":500,"interval":100,"scale":1});
+  }
+  if ('true' == 'true') {
+    stellar.plugins.preload = Object.assign({"enable":true,"service":"flying_pages","instant_page":"https://cdn.jsdelivr.net/gh/volantis-x/cdn-volantis@4.1.2/js/instant_page.js","flying_pages":"https://cdn.jsdelivr.net/gh/gijo-varghese/flying-pages@2.1.2/flying-pages.min.js"});
+  }
+</script>
+
+<!-- required -->
+
+  
+<script src="/js/main.js" async></script>
+
+
+
+<!-- optional -->
+
+  <script>
+  function loadBeaudar() {
+    const els = document.querySelectorAll("#comments #beaudar");
+    if (els.length === 0) return;
+    els.forEach((el, i) => {
+      try {
+        el.innerHTML = '';
+      } catch (error) {
+        console.log(error);
+      }
+      var script = document.createElement('script');
+      script.src = 'https://beaudar.lipk.org/client.js';
+      script.async = true;
+      for (let key of Object.keys(el.attributes)) {
+        let attr = el.attributes[key];
+        if (['class', 'id'].includes(attr.name) === false) {
+          script.setAttribute(attr.name, attr.value);
+        }
+      }
+      el.appendChild(script);
+    });
+  }
+  window.addEventListener('DOMContentLoaded', (event) => {
+      loadBeaudar();
+  });
+</script>
+
+
+
+
+<!-- inject -->
+
+
+  </div>
+</body>
+</html>

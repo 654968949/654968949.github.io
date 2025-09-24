@@ -109,7 +109,20 @@
   </nav>
 </div>
 
-  <div class="post-list post"><a class="post-card post " href="/2025/08/25/MYSQL%E6%89%A7%E8%A1%8Calter%E8%AF%AD%E5%8F%A5%E9%94%81%E8%A1%A8%E4%BA%86%E6%80%8E%E4%B9%88%E5%8A%9E%EF%BC%9F/"><article class="md">
+  <div class="post-list post"><a class="post-card post " href="/2025/09/24/gateway%E5%9C%A8%E5%BE%AE%E6%9C%8D%E5%8A%A1%E4%B8%AD%E7%9A%84%E4%BD%9C%E7%94%A8%E5%8F%8A%E5%B8%B8%E8%A7%81%E7%94%A8%E6%B3%95/"><article class="md">
+<h2 class="post-title">gateway在微服务中的作用及常见用法</h2><div class="excerpt"><p>一、网关在微服务中的作用
+路由转发，将外部请求经由gateway路由转发至相应的微服务
+
+熔断限流，入口都在gateway，自然可以对请求进行熔断限流处理
+
+认证授权，同上理
+
+处理请求的通用逻辑
+
+
+Spring-Cloud体系常用的网关有gateway，zuul（已停止维护）
+二、gateway在Spring-Cloud里面具体怎么使用？2.1 服务路由通常这个路由是写在YAML/Pro...</p></div><div class="meta cap"><span class="cap" id="post-meta">发布于&nbsp;<time datetime="2025-09-24T03:31:26.145Z">2025-09-24</time></span><span class="cap breadcrumb">Spring-Cloud</span><div>
+</article></a><a class="post-card post " href="/2025/08/25/MYSQL%E6%89%A7%E8%A1%8Calter%E8%AF%AD%E5%8F%A5%E9%94%81%E8%A1%A8%E4%BA%86%E6%80%8E%E4%B9%88%E5%8A%9E%EF%BC%9F/"><article class="md">
 <h2 class="post-title">mysql执行alter语句锁表了怎么办？</h2><div class="excerpt"><p>一、执行的ALTER语句12ALTER TABLE order_info    ADD COLUMN `flag` int(11) default 0 not null comment &#x27;0-不急 1--急&#x27;;
 
 假设这个表数量比较大，有一千万数据，同时你又有业务场景对它增删改查，肯定会锁表的。锁表了你们业务就会异常，肯定就会监控报警
@@ -149,15 +162,6 @@ HttpURLConnection每次请求都会打开一个新的TCP连接，不复用TC...<
 
 
 1.2 拉取docker 镜像1docker pull m...</p></div><div class="meta cap"><span class="cap" id="post-meta">发布于&nbsp;<time datetime="2022-06-21T02:31:59.523Z">2022-06-21</time></span><span class="cap breadcrumb">canal</span><div>
-</article></a><a class="post-card post " href="/2022/06/21/%E5%B8%B8%E7%94%A8%E5%88%86%E5%B8%83%E5%BC%8Fid%E5%88%86%E6%9E%90%EF%BC%8C%E4%BB%A5%E5%8F%8A%E4%BB%A3%E7%A0%81%E5%AE%9E%E6%88%98/"><article class="md">
-<h2 class="post-title">常用分布式id分析，以及代码实战</h2><div class="excerpt"><p>前言：分布式Id通常具备的特性
-全局唯一：必须保证ID是全局性唯一的，基本要求
-高性能：高可用低延时，ID生成响应要块，否则反倒会成为业务瓶颈
-高可用：100%的可用性是骗人的，但是也要无限接近于100%的可用性
-好接入：要秉着拿来即用的设计原则，在系统设计和实现上要尽可能的简单
-趋势递增：最好趋势递增，这个要求就得看具体业务场景了，一般不严格要求
-
-一、UUID优点本地生成，没有网络的消耗...</p></div><div class="meta cap"><span class="cap" id="post-meta">发布于&nbsp;<time datetime="2022-06-21T02:31:59.523Z">2022-06-21</time></span><span class="cap breadcrumb">分布式id</span><div>
 </article></a></div>
   
   <div class='paginator-wrap dis-select'>
