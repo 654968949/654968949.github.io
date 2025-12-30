@@ -1,0 +1,939 @@
+
+<!DOCTYPE html><html lang="zh-CN">
+
+<head>
+  <meta charset="utf-8">
+  <meta name="hexo-theme" content="https://github.com/xaoxuu/hexo-theme-stellar/tree/1.33.1" theme-name="Stellar" theme-version="1.33.1">
+  
+  
+  <meta name="generator" content="Hexo 8.1.1">
+  <meta http-equiv='x-dns-prefetch-control' content='on' />
+  
+  <meta name="renderer" content="webkit">
+  <meta name="force-rendering" content="webkit">
+  <meta http-equiv="X-UA-Compatible" content="IE=Edge,chrome=1">
+  <meta name="HandheldFriendly" content="True" >
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <meta name="theme-color" media="(prefers-color-scheme: dark)" content="#000">
+  <meta name="theme-color" content="#f9fafb">
+  <title>docker搭建canal-server和canal-admin - Woods's Blog</title>
+
+  
+    <meta name="description" content="一、搭建有binlog功能的mysql1.1 先建两文件夹我是使用docker来搭建，在服务器上建这么两个目录，用来挂载docker里面的mysql的配置文件，和mysql的数据存储, 后面docker run要用 12&#x2F;etc&#x2F;mysql   ##挂载mysql的配置文件&#x2F;opt&#x2F;mysql   ##挂载mysql的数据存储    1.2 拉取docker 镜像1docker pull mysq">
+<meta property="og:type" content="article">
+<meta property="og:title" content="docker搭建canal-server和canal-admin">
+<meta property="og:url" content="https://github.com/2022/06/21/docker%E6%90%AD%E5%BB%BAcanal-server%E5%92%8Ccanal-admin/">
+<meta property="og:site_name" content="Woods&#39;s Blog">
+<meta property="og:description" content="一、搭建有binlog功能的mysql1.1 先建两文件夹我是使用docker来搭建，在服务器上建这么两个目录，用来挂载docker里面的mysql的配置文件，和mysql的数据存储, 后面docker run要用 12&#x2F;etc&#x2F;mysql   ##挂载mysql的配置文件&#x2F;opt&#x2F;mysql   ##挂载mysql的数据存储    1.2 拉取docker 镜像1docker pull mysq">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://upload.jianshu.io/users/upload_avatars/15586926/58772875-84f9-4db7-9deb-f3d0fc2b57fe.png">
+<meta property="article:published_time" content="2022-06-21T02:31:59.523Z">
+<meta property="article:modified_time" content="2022-07-31T02:44:28.975Z">
+<meta property="article:author" content="WoodsWu">
+<meta property="article:tag" content="canal">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://upload.jianshu.io/users/upload_avatars/15586926/58772875-84f9-4db7-9deb-f3d0fc2b57fe.png">
+  
+  
+  
+  <meta name="keywords" content="canal">
+
+  <!-- feed -->
+  
+
+  <link rel="stylesheet" href="/css/main.css?v=1.33.1">
+
+
+  
+
+  
+
+  <script type="application/ld+json">{"@context":"https://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"WoodsWu","sameAs":[],"image":"https://upload.jianshu.io/users/upload_avatars/15586926/58772875-84f9-4db7-9deb-f3d0fc2b57fe.png"},"dateCreated":"2022-06-21T10:31:59+08:00","dateModified":"2022-07-31T10:44:28+08:00","datePublished":"2022-06-21T10:31:59+08:00","description":"","headline":"docker搭建canal-server和canal-admin","mainEntityOfPage":{"@type":"WebPage","@id":"https://github.com/2022/06/21/docker%E6%90%AD%E5%BB%BAcanal-server%E5%92%8Ccanal-admin/"},"publisher":{"@type":"Organization","name":"WoodsWu","sameAs":[],"image":"https://upload.jianshu.io/users/upload_avatars/15586926/58772875-84f9-4db7-9deb-f3d0fc2b57fe.png","logo":{"@type":"ImageObject","url":"https://upload.jianshu.io/users/upload_avatars/15586926/58772875-84f9-4db7-9deb-f3d0fc2b57fe.png"}},"url":"https://github.com/2022/06/21/docker%E6%90%AD%E5%BB%BAcanal-server%E5%92%8Ccanal-admin/","keywords":"canal","image":[]}</script>
+  
+</head>
+<body>
+
+<div class="l_body content" id="start" layout="post" type="tech" ><aside class="l_left"><div class="sidebg"></div><div class="leftbar-container">
+
+
+<header class="header"><div class="logo-wrap"><a class="avatar" href="/about/"><div class="bg" style="opacity:0;background-image:url(https://gcore.jsdelivr.net/gh/cdn-x/placeholder@1.0.12/avatar/round/rainbow64@3x.webp);"></div><img no-lazy class="avatar" src="https://upload.jianshu.io/users/upload_avatars/15586926/58772875-84f9-4db7-9deb-f3d0fc2b57fe.png" onerror="javascript:this.classList.add('error');this.src='https://gcore.jsdelivr.net/gh/cdn-x/placeholder@1.0.12/image/2659360.svg';"></a><a class="title" href="/"><div class="main">Woods's Blog</div></a></div></header>
+
+<div class="nav-area">
+
+<nav class="menu dis-select"></nav>
+</div>
+<div class="widgets">
+<div class="search-wrapper" id="search-wrapper"><form class="search-form"><a class="search-button" onclick="document.getElementById(&quot;search-input&quot;).focus();"><svg t="1705074644177" viewBox="0 0 1025 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="1560" width="200" height="200"><path d="M1008.839137 935.96571L792.364903 719.491476a56.783488 56.783488 0 0 0-80.152866 0 358.53545 358.53545 0 1 1 100.857314-335.166073 362.840335 362.840335 0 0 1-3.689902 170.145468 51.248635 51.248635 0 1 0 99.217358 26.444296 462.057693 462.057693 0 1 0-158.255785 242.303546l185.930047 185.725053a51.248635 51.248635 0 0 0 72.568068 0 51.248635 51.248635 0 0 0 0-72.978056z" p-id="1561"></path><path d="M616.479587 615.969233a50.428657 50.428657 0 0 0-61.498362-5.534852 174.655348 174.655348 0 0 1-177.525271 3.484907 49.403684 49.403684 0 0 0-58.833433 6.76482l-3.074918 2.869923a49.403684 49.403684 0 0 0 8.609771 78.10292 277.767601 277.767601 0 0 0 286.992355-5.739847 49.403684 49.403684 0 0 0 8.404776-76.667958z" p-id="1562"></path></svg></a><input type="text" class="search-input" id="search-input" placeholder="站内搜索"></form><div id="search-result"></div><div class="search-no-result">没有找到内容！</div></div>
+
+
+
+<widget class="widget-wrapper recent post-list"><div class="widget-header dis-select"><span class="name">最近更新</span></div><div class="widget-body fs14"><a class="item title" href="/2022/06/21/%E5%B8%B8%E7%94%A8%E5%88%86%E5%B8%83%E5%BC%8Fid%E5%88%86%E6%9E%90%EF%BC%8C%E4%BB%A5%E5%8F%8A%E4%BB%A3%E7%A0%81%E5%AE%9E%E6%88%98/"><span class="title">常用分布式id分析，以及代码实战</span></a><a class="item title" href="/2025/12/26/AICode%E9%97%B2%E8%B0%88/"><span class="title">AICode闲谈</span></a><a class="item title" href="/2023/09/28/clickhouse%E5%9F%BA%E7%A1%80%E5%AD%A6%E4%B9%A0/"><span class="title">clickhouse基础学习</span></a><a class="item title" href="/2025/09/25/PolarDB%E6%B5%85%E4%BB%8B%E7%BB%8D/"><span class="title">PolarDB浅介绍</span></a><a class="item title" href="/2025/09/24/gateway%E5%9C%A8%E5%BE%AE%E6%9C%8D%E5%8A%A1%E4%B8%AD%E7%9A%84%E4%BD%9C%E7%94%A8%E5%8F%8A%E5%B8%B8%E8%A7%81%E7%94%A8%E6%B3%95/"><span class="title">gateway在微服务中的作用及常见用法</span></a><a class="item title" href="/2025/08/25/MYSQL%E6%89%A7%E8%A1%8Calter%E8%AF%AD%E5%8F%A5%E9%94%81%E8%A1%A8%E4%BA%86%E6%80%8E%E4%B9%88%E5%8A%9E%EF%BC%9F/"><span class="title">mysql执行alter语句锁表了怎么办？</span></a><a class="item title" href="/2025/08/15/python%E5%90%88%E5%B9%B6%E7%9B%B8%E5%90%8C%E6%A0%BC%E5%BC%8F%E7%9A%84excel%EF%BC%88%E5%B8%A6%E5%90%88%E5%B9%B6%E8%BF%9B%E5%BA%A6%E6%9D%A1%EF%BC%89/"><span class="title">python合并相同格式的excel（带合并进度条）</span></a><a class="item title" href="/2022/06/21/Java%E5%8F%8D%E5%B0%84%E7%B1%BB/"><span class="title">学习Java反射类</span></a><a class="item title" href="/2023/08/18/easyPoi%E8%87%AA%E5%AE%9A%E4%B9%89%E4%BB%A3%E7%A0%81%E5%AF%BC%E5%87%BA%E6%8A%A5%E8%A1%A8/"><span class="title">easyPoi自定义代码导出报表</span></a><a class="item title" href="/2023/04/20/OpenFeign(9.5.0)%E6%80%A7%E8%83%BD%E4%BC%98%E5%8C%96%E5%B0%9D%E8%AF%95%20/"><span class="title">OpenFeign(9.5.0)性能优化尝试</span></a></div></widget>
+</div>
+
+</div></aside><div class="l_main" id="main">
+
+
+
+
+
+<div class="article banner top">
+  <div class="content">
+    <div class="top bread-nav footnote"><div class="left"><div class="flex-row" id="breadcrumb"><a class="cap breadcrumb" href="/">主页</a>
+<span class="sep"></span><a class="cap breadcrumb" href="/">文章</a><span class="sep"></span><a class="cap breadcrumb-link" href="/categories/canal/">canal</a></div>
+<div class="flex-row" id="post-meta"><span class="text created">发布于：<time datetime="2022-06-21T02:31:59.523Z">2022-06-21</time></span><span class="sep updated"></span><span class="text updated">更新于：<time datetime="2022-07-31T02:44:28.975Z">2022-07-31</time></span></div></div></div>
+    
+    <div class="bottom only-title">
+      
+      <div class="text-area">
+        <h1 class="text title"><span>docker搭建canal-server和canal-admin</span></h1>
+        
+      </div>
+    </div>
+    
+  </div>
+  </div><article class="md-text content"><h3 id="一、搭建有binlog功能的mysql"><a href="#一、搭建有binlog功能的mysql" class="headerlink" title="一、搭建有binlog功能的mysql"></a>一、搭建有binlog功能的mysql</h3><h4 id="1-1-先建两文件夹"><a href="#1-1-先建两文件夹" class="headerlink" title="1.1 先建两文件夹"></a>1.1 先建两文件夹</h4><p>我是使用docker来搭建，在服务器上建这么两个目录，用来挂载docker里面的mysql的配置文件，和mysql的数据存储, 后面docker run要用</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">/etc/mysql   ##挂载mysql的配置文件</span><br><span class="line">/opt/mysql   ##挂载mysql的数据存储</span><br></pre></td></tr></table></figure>
+
+
+
+<h4 id="1-2-拉取docker-镜像"><a href="#1-2-拉取docker-镜像" class="headerlink" title="1.2 拉取docker 镜像"></a>1.2 拉取docker 镜像</h4><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">docker pull mysql:5.7</span><br></pre></td></tr></table></figure>
+
+<h4 id="1-3-运行镜像"><a href="#1-3-运行镜像" class="headerlink" title="1.3 运行镜像"></a>1.3 运行镜像</h4><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">docker run -itd --name mysql -p 3306:3306 -e MYSQL_ROOT_PASSWORD=www123456 -v /etc/mysql:/etc/mysql -v /opt/mysql:/var/lib/mysql -v /etc/localtime:/etc/localtime mysql:5.7</span><br></pre></td></tr></table></figure>
+
+<h4 id="1-4-查看挂载情况"><a href="#1-4-查看挂载情况" class="headerlink" title="1.4 查看挂载情况"></a>1.4 查看挂载情况</h4><p>查看挂载情况，里面可以看到详细的挂载情况，可以看到我们的两个目录是被正确挂载了</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">docker inspect 容器名或者id</span><br></pre></td></tr></table></figure>
+
+<p><img src="https://github.com/654968949/woods-learning/blob/master/design-pattern/src/main/resources/ScreenShots/20220723213114.jpg?raw=true"></p>
+<h4 id="1-5-编辑mysql的配置文件"><a href="#1-5-编辑mysql的配置文件" class="headerlink" title="1.5 编辑mysql的配置文件"></a>1.5 编辑mysql的配置文件</h4><p>直接在服务器上编辑mysql的配置文件（和docker容器里面的文件相互挂载了），里面有可能是空的，直接往里面加就行了</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">vim /etc/mysql/mysql.conf.d/mysqld.cnf</span><br><span class="line"></span><br><span class="line">[mysqld]</span><br><span class="line">log-bin=mysql-bin</span><br><span class="line">binlog-format=ROW</span><br><span class="line">server_id=1</span><br></pre></td></tr></table></figure>
+
+<h4 id="1-6-重启mysql"><a href="#1-6-重启mysql" class="headerlink" title="1.6 重启mysql"></a>1.6 重启mysql</h4><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">docker restart 容器名或者id</span><br></pre></td></tr></table></figure>
+
+<h4 id="1-7-查看数据库的binlog是否开启"><a href="#1-7-查看数据库的binlog是否开启" class="headerlink" title="1.7 查看数据库的binlog是否开启"></a>1.7 查看数据库的binlog是否开启</h4><p>用mysql工具查看数据库的binlog是否开启</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">show variables like &#x27;%log_bin%&#x27;;</span><br></pre></td></tr></table></figure>
+
+<p><img src="https://github.com/654968949/woods-learning/blob/master/design-pattern/src/main/resources/ScreenShots/%E6%88%AA%E5%9B%BE.png?raw=true"></p>
+<p>执行一条建表语句看看有没有binlog存在服务器上面</p>
+<p><img src="https://github.com/654968949/woods-learning/blob/master/design-pattern/src/main/resources/ScreenShots/20220722231710.jpg?raw=true"></p>
+<p>确实有，在mysql里面看看日志，到这里mysql就配置好了！</p>
+<p><img src="https://github.com/654968949/woods-learning/blob/master/design-pattern/src/main/resources/ScreenShots/20220722232014.jpg?raw=true"></p>
+<h4 id="1-8-创建canal用户并授权"><a href="#1-8-创建canal用户并授权" class="headerlink" title="1.8 创建canal用户并授权"></a>1.8 创建canal用户并授权</h4><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">mysql&gt; CREATE USER canal IDENTIFIED BY &#x27;canal&#x27;;</span><br><span class="line">mysql&gt; GRANT SELECT, REPLICATION SLAVE, REPLICATION CLIENT ON *.* TO &#x27;canal&#x27;@&#x27;%&#x27;;</span><br><span class="line">mysql&gt; FLUSH PRIVILEGES;</span><br><span class="line">mysql&gt; show grants for &#x27;canal&#x27;@&#x27;%&#x27;;</span><br><span class="line">+----------------------------------------------------------------------------+</span><br><span class="line">| Grants for canal@%%                                                        |</span><br><span class="line">+----------------------------------------------------------------------------+</span><br><span class="line">| GRANT SELECT, REPLICATION SLAVE, REPLICATION CLIENT ON *.* TO `canal`@`%` |</span><br><span class="line">+----------------------------------------------------------------------------+</span><br><span class="line">1 row in set (0.00 sec)</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<h4 id="1-9-创建example库"><a href="#1-9-创建example库" class="headerlink" title="1.9 创建example库"></a>1.9 创建example库</h4><figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">create</span> database woods_test；</span><br></pre></td></tr></table></figure>
+
+
+
+<h3 id="二、搭建canal-server"><a href="#二、搭建canal-server" class="headerlink" title="二、搭建canal-server"></a>二、搭建canal-server</h3><h4 id="注意"><a href="#注意" class="headerlink" title="注意"></a>注意</h4><p>从这开始，就开始经历很多的坑，，，可能是对docker网络这部分不太熟的原因。</p>
+<h4 id="最开始的想法"><a href="#最开始的想法" class="headerlink" title="最开始的想法"></a>最开始的想法</h4><p>我最开始的想法是在一台服务器上的docker里面，运行一个mysql容器，运行一个canal-server容器，然后本地起一个java的canal客户端连接canal-server，监听数据库的增量binlog日志。思路看起来没啥问题。</p>
+<h4 id="开始探索"><a href="#开始探索" class="headerlink" title="开始探索"></a>开始探索</h4><h5 id="以一条docker命令启动"><a href="#以一条docker命令启动" class="headerlink" title="以一条docker命令启动"></a>以一条docker命令启动</h5><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta prompt_"># </span><span class="language-bash">bash run.sh -e canal.auto.scan=<span class="literal">false</span> -e canal.destinations=woods_test -e canal.instance.master.address=172.17.0.3:3306 -e canal.instance.dbUsername=canal -e canal.instance.dbPassword=canal -e canal.instance.connectionCharset=UTF-8 -e canal.instance.tsdb.enable=<span class="literal">true</span> -e canal.instance.gtidon=<span class="literal">false</span></span></span><br></pre></td></tr></table></figure>
+
+<p>显示启动成功</p>
+<p><img src="https://github.com/654968949/woods-learning/blob/master/design-pattern/src/main/resources/ScreenShots/20220729144238.jpg?raw=true"></p>
+<p>Java客户端代码， 其实就是官网的demo</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title function_">main</span><span class="params">(String args[])</span> &#123;</span><br><span class="line">        <span class="comment">// 创建链接</span></span><br><span class="line">        <span class="type">String</span> <span class="variable">hostIp</span> <span class="operator">=</span> AddressUtils.getHostIp();</span><br><span class="line">        System.out.println(hostIp);</span><br><span class="line">        <span class="type">CanalConnector</span> <span class="variable">connector</span> <span class="operator">=</span> CanalConnectors.newSingleConnector(<span class="keyword">new</span> <span class="title class_">InetSocketAddress</span>(</span><br><span class="line">                <span class="string">&quot;42.193.12.204&quot;</span>, <span class="comment">//canal-server的ip地址</span></span><br><span class="line">                <span class="number">11111</span>),</span><br><span class="line">                <span class="string">&quot;woods_test&quot;</span>,</span><br><span class="line">                <span class="string">&quot;canal&quot;</span>,</span><br><span class="line">                <span class="string">&quot;canal&quot;</span>);</span><br><span class="line">        <span class="type">int</span> <span class="variable">batchSize</span> <span class="operator">=</span> <span class="number">1000</span>;</span><br><span class="line">        <span class="type">int</span> <span class="variable">emptyCount</span> <span class="operator">=</span> <span class="number">0</span>;</span><br><span class="line">        <span class="keyword">try</span> &#123;</span><br><span class="line">            connector.connect();</span><br><span class="line">            connector.subscribe(<span class="string">&quot;.*\\..*&quot;</span>);</span><br><span class="line">            connector.rollback();</span><br><span class="line">            <span class="type">int</span> <span class="variable">totalEmptyCount</span> <span class="operator">=</span> <span class="number">120</span>;</span><br><span class="line">            <span class="keyword">while</span> (emptyCount &lt; totalEmptyCount) &#123;</span><br><span class="line">                <span class="type">Message</span> <span class="variable">message</span> <span class="operator">=</span> connector.getWithoutAck(batchSize); <span class="comment">// 获取指定数量的数据</span></span><br><span class="line">                <span class="type">long</span> <span class="variable">batchId</span> <span class="operator">=</span> message.getId();</span><br><span class="line">                <span class="type">int</span> <span class="variable">size</span> <span class="operator">=</span> message.getEntries().size();</span><br><span class="line">                <span class="keyword">if</span> (batchId == -<span class="number">1</span> || size == <span class="number">0</span>) &#123;</span><br><span class="line">                    emptyCount++;</span><br><span class="line">                    System.out.println(<span class="string">&quot;empty count : &quot;</span> + emptyCount);</span><br><span class="line">                    <span class="keyword">try</span> &#123;</span><br><span class="line">                        Thread.sleep(<span class="number">1000</span>);</span><br><span class="line">                    &#125; <span class="keyword">catch</span> (InterruptedException e) &#123;</span><br><span class="line">                    &#125;</span><br><span class="line">                &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">                    emptyCount = <span class="number">0</span>;</span><br><span class="line">                    <span class="comment">// System.out.printf(&quot;message[batchId=%s,size=%s] \n&quot;, batchId, size);</span></span><br><span class="line">                    printEntry(message.getEntries());</span><br><span class="line">                &#125;</span><br><span class="line"></span><br><span class="line">                connector.ack(batchId); <span class="comment">// 提交确认</span></span><br><span class="line">                <span class="comment">// connector.rollback(batchId); // 处理失败, 回滚数据</span></span><br><span class="line">            &#125;</span><br><span class="line"></span><br><span class="line">            System.out.println(<span class="string">&quot;empty too many times, exit&quot;</span>);</span><br><span class="line">        &#125; <span class="keyword">finally</span> &#123;</span><br><span class="line">            connector.disconnect();</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title function_">printEntry</span><span class="params">(List&lt;Entry&gt; entrys)</span> &#123;</span><br><span class="line">        <span class="keyword">for</span> (Entry entry : entrys) &#123;</span><br><span class="line">            <span class="keyword">if</span> (entry.getEntryType() == EntryType.TRANSACTIONBEGIN || entry.getEntryType() == EntryType.TRANSACTIONEND) &#123;</span><br><span class="line">                <span class="keyword">continue</span>;</span><br><span class="line">            &#125;</span><br><span class="line"></span><br><span class="line">            <span class="type">RowChange</span> <span class="variable">rowChage</span> <span class="operator">=</span> <span class="literal">null</span>;</span><br><span class="line">            <span class="keyword">try</span> &#123;</span><br><span class="line">                rowChage = RowChange.parseFrom(entry.getStoreValue());</span><br><span class="line">            &#125; <span class="keyword">catch</span> (Exception e) &#123;</span><br><span class="line">                <span class="keyword">throw</span> <span class="keyword">new</span> <span class="title class_">RuntimeException</span>(<span class="string">&quot;ERROR ## parser of eromanga-event has an error , data:&quot;</span> + entry.toString(),</span><br><span class="line">                        e);</span><br><span class="line">            &#125;</span><br><span class="line"></span><br><span class="line">            <span class="type">EventType</span> <span class="variable">eventType</span> <span class="operator">=</span> rowChage.getEventType();</span><br><span class="line">            System.out.println(String.format(<span class="string">&quot;================&amp;gt; binlog[%s:%s] , name[%s,%s] , eventType : %s&quot;</span>,</span><br><span class="line">                    entry.getHeader().getLogfileName(), entry.getHeader().getLogfileOffset(),</span><br><span class="line">                    entry.getHeader().getSchemaName(), entry.getHeader().getTableName(),</span><br><span class="line">                    eventType));</span><br><span class="line"></span><br><span class="line">            <span class="keyword">for</span> (RowData rowData : rowChage.getRowDatasList()) &#123;</span><br><span class="line">                <span class="keyword">if</span> (eventType == EventType.DELETE) &#123;</span><br><span class="line">                    printColumn(rowData.getBeforeColumnsList());</span><br><span class="line">                &#125; <span class="keyword">else</span> <span class="keyword">if</span> (eventType == EventType.INSERT) &#123;</span><br><span class="line">                    printColumn(rowData.getAfterColumnsList());</span><br><span class="line">                &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">                    System.out.println(<span class="string">&quot;-------&amp;gt; before&quot;</span>);</span><br><span class="line">                    printColumn(rowData.getBeforeColumnsList());</span><br><span class="line">                    System.out.println(<span class="string">&quot;-------&amp;gt; after&quot;</span>);</span><br><span class="line">                    printColumn(rowData.getAfterColumnsList());</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title function_">printColumn</span><span class="params">(List&lt;Column&gt; columns)</span> &#123;</span><br><span class="line">        <span class="keyword">for</span> (Column column : columns) &#123;</span><br><span class="line">            System.out.println(column.getName() + <span class="string">&quot; : &quot;</span> + column.getValue() + <span class="string">&quot;    update=&quot;</span> + column.getUpdated());</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure>
+
+<p>上面的Java客户端是怎么起都启动不起来，一直报这个错</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">Exception in thread <span class="string">&quot;main&quot;</span> com.alibaba.otter.canal.protocol.exception.CanalClientException: failed to subscribe with reason: something goes wrong with channel:[id: <span class="number">0x70fe412e</span>, /<span class="number">118.112</span><span class="number">.75</span><span class="number">.194</span>:<span class="number">7136</span> =&gt; /<span class="number">172.17</span><span class="number">.0</span><span class="number">.4</span>:<span class="number">11111</span>], exception=com.alibaba.otter.canal.server.exception.CanalServerException: destination:example should start first</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">tail</span> -fn 100 /home/admin/canal-server/logs/example/example.log  //查日志</span><br></pre></td></tr></table></figure>
+
+<p>去docker容器里面查看日志找原因，发现是canal1.16版本的bug，使得canal-server会去查一张不存在的表，所以这里我修改了一下run.sh里面最后的cmd命令，指定了canal-server的版本</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">cmd=&quot;docker run -d -it -h $LOCALHOST $CONFIG --name=canal-server $VOLUMNS $NET_MODE $PORTS $MEMORY canal/canal-server:v1.1.4&quot;</span><br></pre></td></tr></table></figure>
+
+<p>再次启动java的canal-client，可以看到连接成功，正在定时获取binlog，如果监听的库有表的插入或更新，客户端就会打印出来</p>
+<p><img src="https://github.com/654968949/woods-learning/blob/master/design-pattern/src/main/resources/ScreenShots/20220729223509.jpg?raw=true"></p>
+<h5 id="编写docker-compose-yml来启动"><a href="#编写docker-compose-yml来启动" class="headerlink" title="编写docker-compose.yml来启动"></a>编写docker-compose.yml来启动</h5><figure class="highlight yaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">version:</span> <span class="string">&#x27;2&#x27;</span></span><br><span class="line"></span><br><span class="line"><span class="attr">services:</span></span><br><span class="line">  <span class="attr">canal-server:</span></span><br><span class="line">    <span class="attr">network_mode:</span> <span class="string">&quot;bridge&quot;</span>  <span class="comment">#因为我mysql是在这个默认的网络下面，所以我的canal-server也加入这个网络</span></span><br><span class="line">    <span class="attr">image:</span> <span class="string">canal/canal-server:v1.1.4</span> <span class="comment">#最新的可能有bug，就用这个1.14吧</span></span><br><span class="line">    <span class="attr">container_name:</span> <span class="string">canal-server</span></span><br><span class="line">    <span class="attr">ports:</span></span><br><span class="line">      <span class="bullet">-</span> <span class="number">11111</span><span class="string">:11111</span></span><br><span class="line">    <span class="attr">environment:</span></span><br><span class="line">      <span class="bullet">-</span> <span class="string">canal.auto.scan=false</span></span><br><span class="line">      <span class="bullet">-</span> <span class="string">canal.destinations=woods_test</span></span><br><span class="line">      <span class="bullet">-</span> <span class="string">canal.instance.master.address=172.17.0.3:3306</span>  <span class="comment">#要监听的mysql地址</span></span><br><span class="line">      <span class="bullet">-</span> <span class="string">canal.instance.dbUsername=canal</span></span><br><span class="line">      <span class="bullet">-</span> <span class="string">canal.instance.dbPassword=canal</span></span><br><span class="line">      <span class="bullet">-</span> <span class="string">canal.instance.connectionCharset=UTF-8</span></span><br><span class="line">      <span class="bullet">-</span> <span class="string">canal.instance.tsdb.enable=true</span> </span><br><span class="line">      <span class="bullet">-</span> <span class="string">canal.instance.gtidon=false</span></span><br><span class="line">      <span class="bullet">-</span> <span class="string">canal.instance.filter.regex=.*\\..*</span>  <span class="comment">#监听规则</span></span><br><span class="line">    <span class="attr">volumes:</span></span><br><span class="line">      <span class="bullet">-</span> <span class="string">./canal-server/conf/:/admin/canal-server/conf/</span> <span class="comment">#挂载文件至宿主机</span></span><br><span class="line">      <span class="bullet">-</span> <span class="string">./canal-server/logs/:/admin/canal-server/logs/</span></span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<p>启动java客户端后同样可以正确监听到woods_test数据库的变化。success！</p>
+<h3 id="三、搭建canal-admin"><a href="#三、搭建canal-admin" class="headerlink" title="三、搭建canal-admin"></a>三、搭建canal-admin</h3><h4 id="通过docker-compose-启动-canal-admin"><a href="#通过docker-compose-启动-canal-admin" class="headerlink" title="通过docker-compose 启动 canal-admin"></a>通过docker-compose 启动 canal-admin</h4><figure class="highlight yaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">version:</span> <span class="string">&#x27;2&#x27;</span></span><br><span class="line"></span><br><span class="line"><span class="attr">services:</span></span><br><span class="line">  <span class="attr">canal-admin:</span></span><br><span class="line">    <span class="attr">network_mode:</span> <span class="string">&quot;bridge&quot;</span>  <span class="comment">#因为我mysql和canal-server是在这个默认的网络下面，所以我的canal-admin也加入这个网络</span></span><br><span class="line">    <span class="attr">image:</span> <span class="string">canal/canal-admin:v1.1.4</span></span><br><span class="line">    <span class="attr">container_name:</span> <span class="string">canal-admin</span></span><br><span class="line">    <span class="attr">ports:</span></span><br><span class="line">      <span class="bullet">-</span> <span class="number">8089</span><span class="string">:8089</span></span><br><span class="line">    <span class="attr">environment:</span></span><br><span class="line">      <span class="bullet">-</span> <span class="string">server.port=8089</span></span><br><span class="line">      <span class="bullet">-</span> <span class="string">canal.adminUser=admin</span></span><br><span class="line">      <span class="bullet">-</span> <span class="string">canal.adminPasswd=admin</span></span><br></pre></td></tr></table></figure>
+
+<h4 id="登录-ip-8089-canal-admin-管理界面"><a href="#登录-ip-8089-canal-admin-管理界面" class="headerlink" title="登录 ip:8089 canal-admin 管理界面"></a>登录 ip:8089 canal-admin 管理界面</h4><p><img src="https://github.com/654968949/woods-learning/blob/master/design-pattern/src/main/resources/ScreenShots/canal-admin%E6%9C%80%E5%88%9D.jpg?raw=true"></p>
+<h4 id="手动新建server"><a href="#手动新建server" class="headerlink" title="手动新建server"></a>手动新建server</h4><p>ip就填canal-server的ip，端口就默认的那几个</p>
+<p><img src="https://github.com/654968949/woods-learning/blob/master/design-pattern/src/main/resources/ScreenShots/%E6%96%B0%E5%BB%BAserver.jpg?raw=true"></p>
+<h4 id="手动新建instance"><a href="#手动新建instance" class="headerlink" title="手动新建instance"></a>手动新建instance</h4><p>改一下canal.instance.master.address就行，你的mysql IP地址</p>
+<p><img src="https://github.com/654968949/woods-learning/blob/master/design-pattern/src/main/resources/ScreenShots/%E6%96%B0%E5%BB%BAinstance.jpg?raw=true"></p>
+<p>上面两步完成后，使用java的canal客户端进行连接，可以看到定时获取binlog的日志打印，如果监控的库有更新插入，则会有相应的日志打印出来，要注意的问题是，使用了admin客户端和server连接后，我们的java客户端在连接的时候不能使用之前用的明文的密码canal进行连接，需要使用密文 <strong>E3619321C1A937C46A0D8BD1DAC39F93B27D4458</strong>，或者你去mysql里查询</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">select password(&#x27;canal&#x27;);  ## *E3619321C1A937C46A0D8BD1DAC39F93B27D4458  用不要星号的后面就行</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">##java客户端连接  就变成这样了</span><br><span class="line"> // 创建链接</span><br><span class="line">        String hostIp = AddressUtils.getHostIp();</span><br><span class="line">        System.out.println(hostIp);</span><br><span class="line">        CanalConnector connector = CanalConnectors.newSingleConnector(new InetSocketAddress(</span><br><span class="line">                &quot;42.193.12.204&quot;,</span><br><span class="line">                11111),</span><br><span class="line">                &quot;woods_test&quot;,</span><br><span class="line">                &quot;canal&quot;,</span><br><span class="line">                &quot;E3619321C1A937C46A0D8BD1DAC39F93B27D4458&quot;);</span><br><span class="line">        int batchSize = 1000;</span><br><span class="line">        int emptyCount = 0;</span><br></pre></td></tr></table></figure>
+
+<h3 id="完结，撒花！"><a href="#完结，撒花！" class="headerlink" title="完结，撒花！"></a>完结，撒花！</h3></article>
+<div class="article-footer">
+    <section id="license">
+      <div class="header"><span>许可协议</span></div>
+      <div class="body"><p>本文采用 <a target="_blank" rel="noopener" href="https://creativecommons.org/licenses/by-nc-sa/4.0/">署名-非商业性使用-相同方式共享 4.0 国际</a> 许可协议，转载请注明出处。</p>
+</div>
+    </section>
+    
+
+</div>
+
+<div class="related-wrap" id="read-next"><section class="body"><div class="item" id="prev"><div class="note">较新文章</div><a href="/2022/06/21/SpringBoot%E7%9A%84%E5%9B%9B%E7%A7%8D%E9%89%B4%E6%9D%83%E6%96%B9%E5%BC%8F/">SpringBoot的四种鉴权方式</a></div><div class="item" id="next"><div class="note">较早文章</div><a href="/2022/06/21/%E5%B8%B8%E7%94%A8%E5%88%86%E5%B8%83%E5%BC%8Fid%E5%88%86%E6%9E%90%EF%BC%8C%E4%BB%A5%E5%8F%8A%E4%BB%A3%E7%A0%81%E5%AE%9E%E6%88%98/">常用分布式id分析，以及代码实战</a></div></section></div>
+
+
+
+
+  <div class="related-wrap md-text" id="comments">
+    <section class='header cmt-title cap theme'>
+      <p>快来参与讨论吧~</p>
+
+    </section>
+    <section class='body cmt-body beaudar'>
+      
+
+<svg class="loading" style="vertical-align:middle;fill:currentColor;overflow:hidden;" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="2709"><path d="M832 512c0-176-144-320-320-320V128c211.2 0 384 172.8 384 384h-64zM192 512c0 176 144 320 320 320v64C300.8 896 128 723.2 128 512h64z" p-id="2710"></path></svg>
+
+<div id="beaudar" repo="654968949/blog-comments" issue-term="pathname" theme="preferred-color-scheme" input-position="top" comment-order="desc" loading="false" branch="main"></div>
+
+    </section>
+  </div>
+
+
+
+<footer class="page-footer footnote"><hr><div class="text"><p>本站由 <a href="/">WoodsWu</a> 使用 <a href="https://github.com/xaoxuu/hexo-theme-stellar/tree/1.33.1">Stellar 1.33.1</a> 主题创建。<br>本博客所有文章除特别声明外，均采用 <a target="_blank" rel="noopener" href="https://creativecommons.org/licenses/by-nc-sa/4.0/">CC BY-NC-SA 4.0</a> 许可协议，转载请注明出处。</p>
+</div></footer>
+<div class="main-mask" onclick="sidebar.dismiss()"></div></div><aside class="l_right">
+<div class="widgets">
+
+
+
+<widget class="widget-wrapper toc" id="data-toc" collapse="false"><div class="widget-header dis-select"><span class="name">本文目录</span><a class="cap-action" onclick="sidebar.toggleTOC()" ><svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6h11m-11 6h11m-11 6h11M4 6h1v4m-1 0h2m0 8H4c0-1 2-2 2-3s-1-1.5-2-1"/></svg></a></div><div class="widget-body"><ol class="toc"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%B8%80%E3%80%81%E6%90%AD%E5%BB%BA%E6%9C%89binlog%E5%8A%9F%E8%83%BD%E7%9A%84mysql"><span class="toc-text">一、搭建有binlog功能的mysql</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#1-1-%E5%85%88%E5%BB%BA%E4%B8%A4%E6%96%87%E4%BB%B6%E5%A4%B9"><span class="toc-text">1.1 先建两文件夹</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#1-2-%E6%8B%89%E5%8F%96docker-%E9%95%9C%E5%83%8F"><span class="toc-text">1.2 拉取docker 镜像</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#1-3-%E8%BF%90%E8%A1%8C%E9%95%9C%E5%83%8F"><span class="toc-text">1.3 运行镜像</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#1-4-%E6%9F%A5%E7%9C%8B%E6%8C%82%E8%BD%BD%E6%83%85%E5%86%B5"><span class="toc-text">1.4 查看挂载情况</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#1-5-%E7%BC%96%E8%BE%91mysql%E7%9A%84%E9%85%8D%E7%BD%AE%E6%96%87%E4%BB%B6"><span class="toc-text">1.5 编辑mysql的配置文件</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#1-6-%E9%87%8D%E5%90%AFmysql"><span class="toc-text">1.6 重启mysql</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#1-7-%E6%9F%A5%E7%9C%8B%E6%95%B0%E6%8D%AE%E5%BA%93%E7%9A%84binlog%E6%98%AF%E5%90%A6%E5%BC%80%E5%90%AF"><span class="toc-text">1.7 查看数据库的binlog是否开启</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#1-8-%E5%88%9B%E5%BB%BAcanal%E7%94%A8%E6%88%B7%E5%B9%B6%E6%8E%88%E6%9D%83"><span class="toc-text">1.8 创建canal用户并授权</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#1-9-%E5%88%9B%E5%BB%BAexample%E5%BA%93"><span class="toc-text">1.9 创建example库</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%BA%8C%E3%80%81%E6%90%AD%E5%BB%BAcanal-server"><span class="toc-text">二、搭建canal-server</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#%E6%B3%A8%E6%84%8F"><span class="toc-text">注意</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E6%9C%80%E5%BC%80%E5%A7%8B%E7%9A%84%E6%83%B3%E6%B3%95"><span class="toc-text">最开始的想法</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E5%BC%80%E5%A7%8B%E6%8E%A2%E7%B4%A2"><span class="toc-text">开始探索</span></a><ol class="toc-child"><li class="toc-item toc-level-5"><a class="toc-link" href="#%E4%BB%A5%E4%B8%80%E6%9D%A1docker%E5%91%BD%E4%BB%A4%E5%90%AF%E5%8A%A8"><span class="toc-text">以一条docker命令启动</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#%E7%BC%96%E5%86%99docker-compose-yml%E6%9D%A5%E5%90%AF%E5%8A%A8"><span class="toc-text">编写docker-compose.yml来启动</span></a></li></ol></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%B8%89%E3%80%81%E6%90%AD%E5%BB%BAcanal-admin"><span class="toc-text">三、搭建canal-admin</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#%E9%80%9A%E8%BF%87docker-compose-%E5%90%AF%E5%8A%A8-canal-admin"><span class="toc-text">通过docker-compose 启动 canal-admin</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E7%99%BB%E5%BD%95-ip-8089-canal-admin-%E7%AE%A1%E7%90%86%E7%95%8C%E9%9D%A2"><span class="toc-text">登录 ip:8089 canal-admin 管理界面</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E6%89%8B%E5%8A%A8%E6%96%B0%E5%BB%BAserver"><span class="toc-text">手动新建server</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E6%89%8B%E5%8A%A8%E6%96%B0%E5%BB%BAinstance"><span class="toc-text">手动新建instance</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%AE%8C%E7%BB%93%EF%BC%8C%E6%92%92%E8%8A%B1%EF%BC%81"><span class="toc-text">完结，撒花！</span></a></li></ol></div><div class="widget-footer"><a class="top" onclick="util.scrollTop()"><svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24"><!-- Icon from Solar by 480 Design - https://creativecommons.org/licenses/by/4.0/ --><g fill="none" stroke="currentColor" stroke-linecap="round" stroke-width="1.5"><path stroke-linejoin="round" d="m9 15.5l3-3l3 3m-6-4l3-3l3 3"/><path d="M7 3.338A9.95 9.95 0 0 1 12 2c5.523 0 10 4.477 10 10s-4.477 10-10 10S2 17.523 2 12c0-1.821.487-3.53 1.338-5"/></g></svg><span>回到顶部</span></a><a class="buttom" onclick="util.scrollComment()"><svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24"><!-- Icon from Solar by 480 Design - https://creativecommons.org/licenses/by/4.0/ --><path fill="none" stroke="currentColor" stroke-linecap="round" stroke-width="1.5" d="M8 10.5h8M8 14h5.5M17 3.338A9.95 9.95 0 0 0 12 2C6.477 2 2 6.477 2 12c0 1.6.376 3.112 1.043 4.453c.178.356.237.763.134 1.148l-.595 2.226a1.3 1.3 0 0 0 1.591 1.592l2.226-.596a1.63 1.63 0 0 1 1.149.133A9.96 9.96 0 0 0 12 22c5.523 0 10-4.477 10-10c0-1.821-.487-3.53-1.338-5"/></svg><span>参与讨论</span></a></div></widget>
+</div></aside><div class='float-panel'>
+  <button type='button' style='display:none' class='laptop-only rightbar-toggle mobile' onclick='sidebar.rightbar()'>
+    <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6h11m-11 6h11m-11 6h11M4 6h1v4m-1 0h2m0 8H4c0-1 2-2 2-3s-1-1.5-2-1"/></svg>
+  </button>
+  <button type='button' style='display:none' class='mobile-only leftbar-toggle mobile' onclick='sidebar.leftbar()'>
+    <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.5"><path d="M2 11c0-3.771 0-5.657 1.172-6.828C4.343 3 6.229 3 10 3h4c3.771 0 5.657 0 6.828 1.172C22 5.343 22 7.229 22 11v2c0 3.771 0 5.657-1.172 6.828C19.657 21 17.771 21 14 21h-4c-3.771 0-5.657 0-6.828-1.172C2 18.657 2 16.771 2 13z"/><path id="sep" stroke-linecap="round" d="M5.5 10h6m-5 4h4m4.5 7V3"/></g></svg>
+  </button>
+</div>
+</div><div class="scripts">
+
+
+<script type="text/javascript">
+  window.canonical = {"originalHost":null,"officialHosts":["localhost"],"encoded":""};
+  const ctx = {
+    date_suffix: {
+      just: `刚刚`,
+      min: `分钟前`,
+      hour: `小时前`,
+      day: `天前`,
+    },
+    root : `/`,
+    tag_plugins: {
+      chat: Object.assign({"api":"https://siteinfo.listentothewind.cn/api/v1"}),
+    }
+  };
+
+  // required plugins (only load if needs)
+  if (`local_search`) {
+    ctx.search = {};
+    ctx.search.service = `local_search`;
+    if (ctx.search.service == 'local_search') {
+      let service_obj = Object.assign({}, `{"field":"all","path":"/search.json","content":true,"skip_search":null,"sort":"-date"}`);
+      ctx.search[ctx.search.service] = service_obj;
+    }
+  }
+  const def = {
+    avatar: `https://gcore.jsdelivr.net/gh/cdn-x/placeholder@1.0.12/avatar/round/3442075.svg`,
+    cover: `https://gcore.jsdelivr.net/gh/cdn-x/placeholder@1.0.12/cover/76b86c0226ffd.svg`,
+    loading: `https://api.iconify.design/eos-icons:three-dots-loading.svg?color=%231cd0fd`,
+  };
+  const deps = {
+    jquery: `https://gcore.jsdelivr.net/npm/jquery@3.7/dist/jquery.min.js`,
+    marked: `https://gcore.jsdelivr.net/npm/marked@13.0/lib/marked.umd.min.js`,
+    lazyload: `/%5Bobject%20Object%5D`
+  }
+  
+
+</script>
+
+<script type="text/javascript">
+  
+  function RunItem() {
+    this.list = []; // 存放回调函数
+    this.start = () => {
+      for (var i = 0; i < this.list.length; i++) {
+        this.list[i].run();
+      }
+    };
+    this.push = (fn, name, setRequestAnimationFrame = true) => {
+      let myfn = fn
+      if (setRequestAnimationFrame) {
+        myfn = () => {
+          utils.requestAnimationFrame(fn)
+        }
+      }
+      var f = new Item(myfn, name);
+      this.list.push(f);
+    };
+    this.remove = (name) => {
+      for (let index = 0; index < this.list.length; index++) {
+        const e = this.list[index];
+        if (e.name == name) {
+          this.list.splice(index, 1);
+        }
+      }
+    }
+    // 构造一个可以run的对象
+    function Item(fn, name) {
+      // 函数名称
+      this.name = name || fn.name;
+      // run方法
+      this.run = () => {
+        try {
+          fn()
+        } catch (error) {
+          console.log(error);
+        }
+      };
+    }
+  }
+
+  const utils = {
+    // 懒加载 css https://github.com/filamentgroup/loadCSS
+    css: (href, before, media, attributes) => {
+      var doc = window.document;
+      var ss = doc.createElement("link");
+      var ref;
+      if (before) {
+        ref = before;
+      } else {
+        var refs = (doc.body || doc.getElementsByTagName("head")[0]).childNodes;
+        ref = refs[refs.length - 1];
+      }
+      var sheets = doc.styleSheets;
+      if (attributes) {
+        for (var attributeName in attributes) {
+          if (attributes.hasOwnProperty(attributeName)) {
+            ss.setAttribute(attributeName, attributes[attributeName]);
+          }
+        }
+      }
+      ss.rel = "stylesheet";
+      ss.href = href;
+      ss.media = "only x";
+      function ready(cb) {
+        if (doc.body) {
+          return cb();
+        }
+        setTimeout(function () {
+          ready(cb);
+        });
+      }
+      ready(function () {
+        ref.parentNode.insertBefore(ss, before ? ref : ref.nextSibling);
+      });
+      var onloadcssdefined = function (cb) {
+        var resolvedHref = ss.href;
+        var i = sheets.length;
+        while (i--) {
+          if (sheets[i].href === resolvedHref) {
+            return cb();
+          }
+        }
+        setTimeout(function () {
+          onloadcssdefined(cb);
+        });
+      };
+      function loadCB() {
+        if (ss.addEventListener) {
+          ss.removeEventListener("load", loadCB);
+        }
+        ss.media = media || "all";
+      }
+      if (ss.addEventListener) {
+        ss.addEventListener("load", loadCB);
+      }
+      ss.onloadcssdefined = onloadcssdefined;
+      onloadcssdefined(loadCB);
+      return ss;
+    },
+
+    js: (src, opt) => new Promise((resolve, reject) => {
+      var script = document.createElement('script');
+      if (src.startsWith('/')) {
+        src = ctx.root + src.substring(1);
+      }
+      script.src = src;
+      if (opt) {
+        for (let key of Object.keys(opt)) {
+          script[key] = opt[key]
+        }
+      } else {
+        // 默认异步，如果需要同步，第二个参数传入 {} 即可
+        script.async = true
+      }
+      script.onerror = reject
+      script.onload = script.onreadystatechange = function () {
+        const loadState = this.readyState
+        if (loadState && loadState !== 'loaded' && loadState !== 'complete') return
+        script.onload = script.onreadystatechange = null
+        resolve()
+      }
+      document.head.appendChild(script)
+    }),
+
+    jq: (fn) => {
+      if (typeof jQuery === 'undefined') {
+        utils.js(deps.jquery).then(fn)
+      } else {
+        fn()
+      }
+    },
+
+    onLoading: (el) => {
+      if (el) {
+        $(el).append('<div class="loading-wrap"><svg xmlns="http://www.w3.org/2000/svg" width="2em" height="2em" preserveAspectRatio="xMidYMid meet" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-linecap="round" stroke-width="2"><path stroke-dasharray="60" stroke-dashoffset="60" stroke-opacity=".3" d="M12 3C16.9706 3 21 7.02944 21 12C21 16.9706 16.9706 21 12 21C7.02944 21 3 16.9706 3 12C3 7.02944 7.02944 3 12 3Z"><animate fill="freeze" attributeName="stroke-dashoffset" dur="1.3s" values="60;0"/></path><path stroke-dasharray="15" stroke-dashoffset="15" d="M12 3C16.9706 3 21 7.02944 21 12"><animate fill="freeze" attributeName="stroke-dashoffset" dur="0.3s" values="15;0"/><animateTransform attributeName="transform" dur="1.5s" repeatCount="indefinite" type="rotate" values="0 12 12;360 12 12"/></path></g></svg></div>');
+      }
+    },
+    onLoadSuccess: (el) => {
+      if (el) {
+        $(el).find('.loading-wrap').remove();
+      }
+    },
+    onLoadFailure: (el) => {
+      if (el) {
+        $(el).find('.loading-wrap svg').remove();
+        $(el).find('.loading-wrap').append('<svg xmlns="http://www.w3.org/2000/svg" width="2em" height="2em" preserveAspectRatio="xMidYMid meet" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"><path stroke-dasharray="60" stroke-dashoffset="60" d="M12 3L21 20H3L12 3Z"><animate fill="freeze" attributeName="stroke-dashoffset" dur="0.5s" values="60;0"/></path><path stroke-dasharray="6" stroke-dashoffset="6" d="M12 10V14"><animate fill="freeze" attributeName="stroke-dashoffset" begin="0.6s" dur="0.2s" values="6;0"/></path></g><circle cx="12" cy="17" r="1" fill="currentColor" fill-opacity="0"><animate fill="freeze" attributeName="fill-opacity" begin="0.8s" dur="0.4s" values="0;1"/></circle></svg>');
+        $(el).find('.loading-wrap').addClass('error');
+      }
+    },
+    request: (el, url, callback, onFailure) => {
+      const maxRetry = 3;
+      let retryCount = 0;
+
+      return new Promise((resolve, reject) => {
+        const load = () => {
+          utils.onLoading?.(el);
+
+          let timedOut = false;
+          const timeout = setTimeout(() => {
+            timedOut = true;
+            console.warn('[request] 超时:', url);
+
+            if (++retryCount >= maxRetry) {
+              utils.onLoadFailure?.(el);
+              onFailure?.();
+              reject('请求超时');
+            } else {
+              setTimeout(load, 1000);
+            }
+          }, 5000);
+
+          fetch(url).then(resp => {
+            if (timedOut) return;
+            clearTimeout(timeout);
+
+            if (!resp.ok) throw new Error('响应失败');
+            return resp;
+          }).then(data => {
+            if (timedOut) return;
+            utils.onLoadSuccess?.(el);
+            callback(data);
+            resolve(data);
+          }).catch(err => {
+            clearTimeout(timeout);
+            console.warn('[request] 错误:', err);
+
+            if (++retryCount >= maxRetry) {
+              utils.onLoadFailure?.(el);
+              onFailure?.();
+              reject(err);
+            } else {
+              setTimeout(load, 1000);
+            }
+          });
+        };
+
+        load();
+      });
+    },
+    requestWithoutLoading: (url, options = {}, maxRetry = 2, timeout = 5000) => {
+      return new Promise((resolve, reject) => {
+        let retryCount = 0;
+
+        const tryRequest = () => {
+          let timedOut = false;
+          const timer = setTimeout(() => {
+            timedOut = true;
+            if (++retryCount > maxRetry) reject('timeout');
+            else tryRequest();
+          }, timeout);
+
+          fetch(url, options)
+            .then(resp => {
+              clearTimeout(timer);
+              if (!resp.ok) throw new Error('bad response');
+              resolve(resp);
+            })
+            .catch(err => {
+              clearTimeout(timer);
+              if (++retryCount > maxRetry) reject(err);
+              else setTimeout(tryRequest, 500);
+            });
+        };
+
+        tryRequest();
+      });
+    },
+    /********************** requestAnimationFrame ********************************/
+    // 1、requestAnimationFrame 会把每一帧中的所有 DOM 操作集中起来，在一次重绘或回流中就完成，并且重绘或回流的时间间隔紧紧跟随浏览器的刷新频率，一般来说，这个频率为每秒60帧。
+    // 2、在隐藏或不可见的元素中，requestAnimationFrame 将不会进行重绘或回流，这当然就意味着更少的的 cpu，gpu 和内存使用量。
+    requestAnimationFrame: (fn) => {
+      if (!window.requestAnimationFrame) {
+        window.requestAnimationFrame = window.requestAnimationFrame || window.mozRequestAnimationFrame || window.webkitRequestAnimationFrame;
+      }
+      window.requestAnimationFrame(fn)
+    },
+    dark: {},
+  };
+
+  // utils.dark.mode 当前模式 dark or light
+  // utils.dark.toggle() 暗黑模式触发器
+  // utils.dark.push(callBack[,"callBackName"]) 传入触发器回调函数
+  utils.dark.method = {
+    toggle: new RunItem(),
+  };
+  utils.dark = Object.assign(utils.dark, {
+    push: utils.dark.method.toggle.push,
+  });
+</script>
+<script>
+  const sidebar = {
+    leftbar: () => {
+      if (l_body) {
+        l_body.toggleAttribute('leftbar');
+        l_body.removeAttribute('rightbar');
+      }
+    },
+    rightbar: () => {
+      if (l_body) {
+        l_body.toggleAttribute('rightbar');
+        l_body.removeAttribute('leftbar');
+      }
+    },
+    dismiss: () => {
+      if (l_body) {
+        l_body.removeAttribute('leftbar');
+        l_body.removeAttribute('rightbar');
+      }
+    },
+    toggleTOC: () => {
+      document.querySelector('#data-toc').classList.toggle('collapse');
+    }
+  }
+</script>
+<script type="text/javascript">
+  (() => {
+    const tagSwitchers = document.querySelectorAll('.tag-subtree.parent-tag > a > .tag-switcher-wrapper')
+    for (const tagSwitcher of tagSwitchers) {
+      tagSwitcher.addEventListener('click', (e) => {
+        const parent = e.target.closest('.tag-subtree.parent-tag')
+        parent.classList.toggle('expanded')
+        e.preventDefault()
+      })
+    }
+
+    // Get active tag from query string, then activate it.
+    const urlParams = new URLSearchParams(window.location.search)
+    const activeTag = urlParams.get('tag')
+    if (activeTag) {
+      let tag = document.querySelector(`.tag-subtree[data-tag="${activeTag}"]`)
+      if (tag) {
+        tag.querySelector('a').classList.add('active')
+        
+        while (tag) {
+          tag.classList.add('expanded')
+          tag = tag.parentElement.closest('.tag-subtree.parent-tag')
+        }
+      }
+    }
+  })()
+</script>
+
+<script async src="https://gcore.jsdelivr.net/npm/vanilla-lazyload@19.1/dist/lazyload.min.js"></script>
+<script>
+  // https://www.npmjs.com/package/vanilla-lazyload
+  // Set the options globally
+  // to make LazyLoad self-initialize
+  window.lazyLoadOptions = {
+    elements_selector: ".lazy",
+    callback_loaded: (el) => {
+      el.classList.add('loaded');
+      const wrapper = el.closest('.lazy-box');
+      const icon = wrapper?.querySelector('.lazy-icon');
+      if (icon) icon.remove();
+    }
+  };
+  // Listen to the initialization event
+  // and get the instance of LazyLoad
+  window.addEventListener(
+    "LazyLoad::Initialized",
+    function (event) {
+      window.lazyLoadInstance = event.detail.instance;
+    },
+    false
+  );
+  document.addEventListener('DOMContentLoaded', function () {
+    window.lazyLoadInstance?.update();
+  });
+
+  window.wrapLazyloadImages = (container) => {
+    if (typeof container === 'string') {
+      container = document.querySelector(container);
+    }
+    if (!container) return;
+    
+    const images = container.querySelectorAll('img');
+    images.forEach((img) => {
+      if (img.classList.contains('lazy')) return;
+
+      const src = img.getAttribute('src');
+      if (!src) return;
+
+      const wrapper = document.createElement('div');
+      wrapper.className = 'lazy-box';
+
+      const newImg = img.cloneNode();
+      newImg.removeAttribute('src');
+      newImg.setAttribute('data-src', src);
+      newImg.classList.add('lazy');
+
+      const icon = document.createElement('div');
+      icon.className = 'lazy-icon';
+      if (def.loading) {
+        icon.style.backgroundImage = `url("${def.loading}")`;
+      }
+
+      wrapper.appendChild(newImg);
+      wrapper.appendChild(icon);
+
+      img.replaceWith(wrapper);
+    });
+
+    // 通知 LazyLoad 更新
+    if (window.lazyLoadInstance?.update) {
+      window.lazyLoadInstance.update();
+    }
+  }
+  
+</script>
+
+<!-- required -->
+<script src="/js/main.js?v=1.33.1" defer></script>
+
+<script type="text/javascript">
+  const applyTheme = (theme) => {
+    if (theme === 'auto') {
+      document.documentElement.removeAttribute('data-theme')
+    } else {
+      document.documentElement.setAttribute('data-theme', theme)
+    }
+
+    // applyThemeToGiscus(theme)
+  }
+
+  // FIXME: 这会导致无法使用 preferred_color_scheme 以外的主题
+  const applyThemeToGiscus = (theme) => {
+    // theme = theme === 'auto' ? 'preferred_color_scheme' : theme
+    const cmt = document.getElementById('giscus')
+    if (cmt) {
+      // This works before giscus load.
+      cmt.setAttribute('data-theme', theme)
+    }
+
+    const iframe = document.querySelector('#comments > section.giscus > iframe')
+    if (iframe) {
+      // This works after giscus loaded.
+      const src = iframe.src
+      const newSrc = src.replace(/theme=[\w]+/, `theme=${theme}`)
+      iframe.src = newSrc
+    }
+  }
+
+  const switchTheme = () => {
+    // light -> dark -> auto -> light -> ...
+    const currentTheme = document.documentElement.getAttribute('data-theme')
+    let newTheme;
+    switch (currentTheme) {
+      case 'light':
+        newTheme = 'dark'
+        break
+      case 'dark':
+        newTheme = 'auto'
+        break
+      default:
+        newTheme = 'light'
+    }
+    applyTheme(newTheme)
+    window.localStorage.setItem('Stellar.theme', newTheme)
+    utils.dark.mode = newTheme === 'auto' ? (window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light") : newTheme;
+    utils.dark.method.toggle.start();
+
+    const messages = {
+      light: `切换到浅色模式`,
+      dark: `切换到深色模式`,
+      auto: `切换到跟随系统配色`,
+    }
+    hud?.toast?.(messages[newTheme])
+  }
+
+  (() => {
+    // Apply user's preferred theme, if any.
+    const theme = window.localStorage.getItem('Stellar.theme')
+    if (theme !== null) {
+      applyTheme(theme)
+    } else {
+      utils.dark.mode = window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
+    }
+    utils.dark.method.toggle.start();
+  })()
+</script>
+
+
+<!-- optional -->
+
+  <script type="module">
+  const el = document.querySelector('#comments #beaudar');
+  util.viewportLazyload(el, load_beaudar, false);
+
+  function load_beaudar() {
+    if (!el) return;
+    try {
+      el.innerHTML = '';
+    } catch (error) {
+      console.error(error);
+    }
+    const script = document.createElement('script');
+    script.src = 'https://beaudar.lipk.org/client.js';
+    script.async = true;
+    for (const key of Object.keys(el.attributes)) {
+      const attr = el.attributes[key];
+      if (['class', 'id'].includes(attr.name) === false) {
+        script.setAttribute(attr.name, attr.value);
+      }
+    }
+    el.appendChild(script);
+  }
+</script>
+
+
+
+
+<script defer>
+  window.addEventListener('DOMContentLoaded', (event) => {
+    ctx.services = Object.assign({}, JSON.parse(`{"mdrender":{"js":"/js/services/mdrender.js"},"siteinfo":{"js":"/js/services/siteinfo.js","api":null},"ghinfo":{"js":"/js/services/ghinfo.js"},"rating":{"js":"/js/services/rating.js","api":"https://star-vote.xaox.cc/api/rating"},"vote":{"js":"/js/services/vote.js","api":"https://star-vote.xaox.cc/api/vote"},"sites":{"js":"/js/services/sites.js"},"friends":{"js":"/js/services/friends.js"},"friends_and_posts":{"js":"/js/services/friends_and_posts.js"},"timeline":{"js":"/js/services/timeline.js"},"fcircle":{"js":"/js/services/fcircle.js"},"weibo":{"js":"/js/services/weibo.js"},"memos":{"js":"/js/services/memos.js"},"voice":{"js":"/js/plugins/voice.js"},"video":{"js":"/js/plugins/video.js"},"download-file":{"js":"/js/plugins/download-file.js"},"twikoo":{"js":"/js/services/twikoo_latest_comment.js"},"waline":{"js":"/js/services/waline_latest_comment.js"},"artalk":{"js":"/js/services/artalk_latest_comment.js"},"giscus":{"js":"/js/services/giscus_latest_comment.js"},"contributors":{"edit_this_page":{"_posts/":null,"wiki/stellar/":"https://github.com/xaoxuu/hexo-theme-stellar-docs/blob/main/"},"js":"/js/services/contributors.js"}}`));
+    for (let id of Object.keys(ctx.services)) {
+      const js = ctx.services[id].js;
+      if (id == 'siteinfo') {
+        ctx.cardlinks = document.querySelectorAll('a.link-card[cardlink]');
+        if (ctx.cardlinks?.length > 0) {
+          utils.js(js, { defer: true }).then(function () {
+            setCardLink(ctx.cardlinks);
+          });
+        }
+      } else if (id == 'voice') {
+        ctx.voiceAudios = document.querySelectorAll('.voice>audio');
+        if (ctx.voiceAudios?.length > 0) {
+          utils.js(js, { defer: true }).then(function () {
+            createVoiceDom(ctx.voiceAudios);
+          });
+        }
+      } else if (id == 'video') {
+        ctx.videos = document.querySelectorAll('.video>video');
+        if (ctx.videos?.length > 0) {
+          utils.js(js, { defer: true }).then(function () {
+            videoEvents(ctx.videos);
+          });
+        }
+      } else if (id == 'download-file') {
+        ctx.files = document.querySelectorAll('.file');
+        if (ctx.files?.length > 0) {
+          utils.js(js, { defer: true }).then(function () {
+            downloadFileEvent(ctx.files);
+          });
+        }
+      } else {
+        const els = document.getElementsByClassName(`ds-${id}`);
+        if (els?.length > 0) {
+          utils.jq(() => {
+            if (id == 'timeline' || 'memos' || 'marked') {
+              utils.js(deps.marked).then(function () {
+                utils.js(js, { defer: true });
+              });
+            } else {
+              utils.js(js, { defer: true });
+            }
+          });
+        }
+      }
+    }
+
+    // chat iphone time
+    let phoneTimes = document.querySelectorAll('.chat .status-bar .time');
+
+    if (phoneTimes.length > 0) {
+      NowTime();
+      var date = new Date();
+      var sec = date.getSeconds();
+      var firstAdjustInterval = setInterval(firstAdjustTime, 1000 * (60 - sec));
+    }
+
+    function firstAdjustTime() {
+      NowTime();
+      clearInterval(firstAdjustInterval);
+      setInterval(NowTime, 1000 * 60);
+    }
+
+    function NowTime() {
+      for (let i = 0; i < phoneTimes.length; ++i) {
+        var timeSpan = phoneTimes[i];
+        var date = new Date();
+        var hour = date.getHours();
+        var min = date.getMinutes();
+        timeSpan.innerHTML = check(hour) + ":" + check(min);
+      }
+    };
+
+    function check(val) {
+      if (val < 10) {
+        return ("0" + val);
+      }
+      return (val);
+    }
+
+    // chat quote
+    const chat_quote_obverser = new IntersectionObserver((entries, observer) => {
+      entries.filter((entry) => { return entry.isIntersecting }).sort((a, b) => a.intersectionRect.y !== b.intersectionRect.y ? a.intersectionRect.y - b.intersectionRect.y : a.intersectionRect.x - b.intersectionRect.x).forEach((entry, index) => {
+          observer.unobserve(entry.target);
+          setTimeout(() => {
+            entry.target.classList.add('quote-blink');
+            setTimeout(() => {
+              entry.target.classList.remove('quote-blink');
+            }, 1000);
+          }, Math.max(100, 16) * (index + 1));
+        });
+    });
+
+    var chatQuotes = document.querySelectorAll(".chat .talk .quote");
+    chatQuotes.forEach((quote) => {
+      quote.addEventListener('click', function () {
+        var chatCellDom = document.getElementById("quote-" + quote.getAttribute("quotedCellTag"));
+        if (chatCellDom) {
+          var chatDiv = chatCellDom.parentElement;
+          var mid = chatDiv.clientHeight / 2;
+          var offsetTop = chatCellDom.offsetTop;
+          if (offsetTop > mid - chatCellDom.clientHeight / 2) {
+            chatDiv.scrollTo({
+              top: chatCellDom.offsetTop - mid + chatCellDom.clientHeight / 2,
+              behavior: "smooth"
+            });
+          } else {
+            chatDiv.scrollTo({
+              top: 0,
+              behavior: "smooth"
+            });
+          }
+          chat_quote_obverser.observe(chatCellDom);
+        }
+      });
+    });
+  });
+</script>
+
+<script>
+  window.addEventListener('DOMContentLoaded', (event) => {
+    ctx.search = {
+      path: `/search.json`,
+    }
+    utils.js('/js/search/local-search.js', { defer: true });
+  });
+</script><script>
+  window.FPConfig = {
+    delay: 0,
+    ignoreKeywords: [],
+    maxRPS: 5,
+    hoverDelay: 25
+  };
+</script>
+<script defer src="https://gcore.jsdelivr.net/npm/flying-pages@2/flying-pages.min.js"></script><script>
+  ctx.fancybox = {
+    selector: `.timenode p>img`,
+    css: `https://gcore.jsdelivr.net/npm/@fancyapps/ui@5.0/dist/fancybox/fancybox.css`,
+    js: `https://gcore.jsdelivr.net/npm/@fancyapps/ui@5.0/dist/fancybox/fancybox.umd.js`
+  };
+  var selector = '[data-fancybox]:not(.error), .with-fancybox .atk-content img:not([atk-emoticon])';
+  if (ctx.fancybox.selector) {
+    selector += `, ${ctx.fancybox.selector}`
+  }
+  var needFancybox = document.querySelectorAll(selector).length !== 0;
+  if (!needFancybox) {
+    const memos = document.getElementsByClassName('ds-memos');
+    if (memos != undefined && memos.length > 0) {
+      needFancybox = true;
+    }
+    const fancybox = document.getElementsByClassName('with-fancybox');
+    if (fancybox != undefined && fancybox.length > 0) {
+      needFancybox = true;
+    }
+  }
+  if (needFancybox) {
+    utils.css(ctx.fancybox.css);
+    utils.js(ctx.fancybox.js, { defer: true }).then(function () {
+      Fancybox.bind(selector, {
+        hideScrollbar: false,
+        Thumbs: {
+          autoStart: false,
+        },
+        caption: (fancybox, slide) => {
+          return slide.triggerEl.alt || slide.triggerEl.dataset.caption || null
+        }
+      });
+    })
+  }
+</script>
+<script>
+  window.addEventListener('DOMContentLoaded', (event) => {
+    const swiper_api = document.getElementById('swiper-api');
+    if (swiper_api != undefined) {
+      utils.css(`https://unpkg.com/swiper@10.3/swiper-bundle.min.css`);
+      utils.js(`https://unpkg.com/swiper@10.3/swiper-bundle.min.js`, { defer: true }).then(function () {
+        const effect = swiper_api.getAttribute('effect') || '';
+        var swiper = new Swiper('.swiper#swiper-api', {
+          slidesPerView: 'auto',
+          spaceBetween: 8,
+          centeredSlides: true,
+          effect: effect,
+          rewind: true,
+          pagination: {
+            el: '.swiper-pagination',
+            clickable: true,
+          },
+          navigation: {
+            nextEl: '.swiper-button-next',
+            prevEl: '.swiper-button-prev',
+          },
+        });
+      })
+    }
+  });
+</script>
+<script>
+  document.addEventListener('DOMContentLoaded', function () {
+    window.codeElements = document.querySelectorAll('.code');
+    if (window.codeElements.length > 0) {
+      ctx.copycode = {
+        default_text: `Copy`,
+        success_text: `Copied`,
+        toast: `复制成功`,
+      };
+      utils.js('/js/plugins/copycode.js');
+    }
+  });
+</script>
+
+
+<!-- inject -->
+
+</div></body></html>
